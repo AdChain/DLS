@@ -74,11 +74,14 @@ contract ADSR {
     if (msg.sender != owner) {
       revert();
     }
+
+    // continue with code execution
     _;
   }
 
   /*
-   * The constructor function, called only once when this contract is initially deployed
+   * The constructor function, called only
+   * once when this contract is initially deployed.
    */
   function ADSR() {
     owner = msg.sender;

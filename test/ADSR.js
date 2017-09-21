@@ -56,15 +56,11 @@ contract('ADSR', function (accounts) {
   it('should deregister publisher from registry', async () => {
     const instance = await ADSR.deployed()
 
-    const id = accounts[1]
-    const domain = 'nytimes.com'
-    const name = 'New York Times'
+    const publisher = accounts[1]
 
-    await instance.registerPublisher(id, domain, name, {from: owner})
-    const [id2, domain2, name2] = await instance.publishers.call(id)
+    await instance.deregisterPublisher(publisher, {from: owner})
+    const [id] = await instance.publishers.call(publisher)
 
-    assert.equal(id2, id)
-    assert.equal(domain2, domain)
-    assert.equal(name2, name)
+    assert.equal(id, 0)
   })
 })
