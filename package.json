@@ -1,0 +1,27 @@
+{
+  "name": "adsr",
+  "version": "0.0.1",
+  "description": "> [ads.txt](https://iabtechlab.com/ads-txt/) - on the blockchain.",
+  "main": "index.js",
+  "directories": {
+    "test": "test"
+  },
+  "scripts": {
+    "test": "truffle test",
+    "compile": "truffle compile",
+    "deploy": "truffle migrate --reset"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/AdChain/ADSR.git"
+  },
+  "keywords": [
+    "ads"
+  ],
+  "author": "",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/AdChain/ADSR/issues"
+  },
+  "homepage": "https://github.com/AdChain/ADSR#readme"
+}
