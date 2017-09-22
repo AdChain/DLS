@@ -10,10 +10,21 @@ const addSellerForm = document.querySelector('.AddSellerForm')
 const removeSellerForm = document.querySelector('.RemoveSellerForm')
 const getSellerForm = document.querySelector('.GetSellerForm')
 
+
 async function addPublisher (address, domain, name) {
   try {
     await instance.registerPublisher(address, domain, name, {from: account})
     alert('added')
+  } catch (error) {
+    alert(error)
+  }
+}
+
+async function isRegisteredPublisher (domain) {
+  try {
+    const isRegistered = await instance.isRegisteredPublisherDomain(domain, {from: account})
+
+    return isRegistered
   } catch (error) {
     alert(error)
   }
@@ -28,7 +39,7 @@ async function getPublisherData () {
       return false
     }
 
-    publisherInfo.innerHTML = `<div>${id}</div><div>${domain}</div><div>${name}</div>`
+    publisherInfo.innerHTML = `<div>address: ${id}</div><div>domain: ${domain}</div><div>name: ${name}</div>`
   } catch (error) {
     alert(error)
   }
@@ -115,7 +126,7 @@ removeSellerForm.addEventListener('submit', event => {
   removeSeller(domain, id)
 })
 
-getSellerForm.addEventListener('submit', event => {
+getSellerForm.addEventListener('submit', async event => {
   event.preventDefault()
   const {target} = event
 
@@ -123,7 +134,13 @@ getSellerForm.addEventListener('submit', event => {
   const sellerDomain = target.sellerDomain.value.trim()
   const sellerId = target.sellerId.value.trim()
 
-  getSeller(pubDomain, sellerDomain, sellerId)
+  const registered = await isRegisteredPublisher(pubDomain)
+
+  if (registered) {
+    getSeller(pubDomain, sellerDomain, sellerId)
+  } else {
+    sellerInfo.innerHTML = `<div>publisher is not in registry</div>`
+  }
 })
 
 const addr = '0x3b69D38EE4040d118F30F8ad21660FC0CA3769cC'

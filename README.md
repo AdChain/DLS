@@ -8,6 +8,14 @@ https://rinkeby.etherscan.io/address/0x343c82f96358e0bac16845fb718ea1d44e107270
 
 # Usage
 
+Check if publisher is in registry
+
+**isRegisteredPublisher(publisherId)**
+
+Check if publisher is in registry by publisher domain
+
+**isRegisteredPublisherDomain(publisherDomain)**
+
 Add seller for publisher
 
 **addSeller(sellerDomain, sellerId, sellerRelationship, sellerTAGID)**

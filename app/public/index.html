@@ -4,42 +4,56 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="initial-scale=1, maximum-scale=1, user-scalable=yes">
   <title>ARDIS</title>
+  <style>
+    .Account {
+      border: 1px solid black;
+      padding: 5px;
+    }
+    input[type="text"] {
+      width: 500px;
+    }
+    label {
+      display: block;
+    }
+  </style>
 </head>
 <body>
   <h1>AdChain Registry of Domain Inventory Sellers</h1>
   <h3>Ads.txt on the blockchain</h3>
 
-  <br />
-  <br />
-  <label>Connected publisher account</label>
-  <div class="PublisherInfo">-</div>
-  <br />
-  <br />
+  <div class="Account">
+    <br />
+    <br />
+    <label>Connected publisher account</label>
+    <div class="PublisherInfo">-</div>
+    <br />
+    <br />
 
-  <form class="AddSellerForm">
-    <div>
-      <label>Add Seller</label>
-      <input type="text" name="seller" />
-    </div>
-    <div>
-      <button type="submit">Add Seller</button>
-    </div>
-  </form>
-  <br />
-  <br />
+    <form class="AddSellerForm">
+      <div>
+        <label>Add Seller</label>
+        <input type="text" name="seller" placeholder="google.com, pub-123, RESELLER, 123" />
+      </div>
+      <div>
+        <button type="submit">Add Seller</button>
+      </div>
+    </form>
+    <br />
+    <br />
 
-  <form class="RemoveSellerForm">
-    <div>
-      <label>Remove Seller</label>
-      <input type="text" name="seller" />
-    </div>
-    <div>
-      <button type="submit">Add Seller</button>
-    </div>
-  </form>
-  <br />
-  <br />
+    <form class="RemoveSellerForm">
+      <div>
+        <label>Remove Seller</label>
+        <input type="text" name="seller" placeholder="google.com, pub-123" />
+      </div>
+      <div>
+        <button type="submit">Add Seller</button>
+      </div>
+    </form>
+  </div>
 
+    <br />
+    <br />
   <form class="GetSellerForm">
     <div>
       <label>Get Seller / Check if has seller</label>

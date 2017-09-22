@@ -17,12 +17,24 @@ contract('ADSR', function (accounts) {
     const domain = 'nytimes.com'
     const name = 'New York Times'
 
+    const isRegistered = await instance.isRegisteredPublisher(id)
+    assert.equal(isRegistered, false)
+
+    const isDomainRegistered = await instance.isRegisteredPublisherDomain(domain)
+    assert.equal(isDomainRegistered, false)
+
     await instance.registerPublisher(id, domain, name, {from: owner})
     const [id2, domain2, name2] = await instance.publishers.call(id)
 
     assert.equal(id2, id)
     assert.equal(domain2, domain)
     assert.equal(name2, name)
+
+    const isRegistered2 = await instance.isRegisteredPublisher(id)
+    assert.equal(isRegistered2, true)
+
+    const isDomainRegistered2 = await instance.isRegisteredPublisherDomain(domain)
+    assert.equal(isDomainRegistered2, true)
   })
 
   it('should add seller to publisher sellers', async () => {
@@ -77,13 +89,22 @@ contract('ADSR', function (accounts) {
     const instance = await ADSR.deployed()
 
     const publisher = accounts[1]
+    const domain = 'nytimes.com'
 
     await instance.deregisterPublisher(publisher, {from: owner})
-    const [id, domain] = await instance.publishers.call(publisher)
+    const [id, domain2, name] = await instance.publishers.call(publisher)
 
     assert.equal(id, 0)
+    assert.equal(name, '')
+    assert.equal(domain2, '')
 
     const id2 = await instance.domainPublisher.call(sha3(domain))
     assert.equal(id2, 0)
+
+    const isRegistered = await instance.isRegisteredPublisher(publisher)
+    assert.equal(isRegistered, false)
+
+    const isDomainRegistered = await instance.isRegisteredPublisherDomain(domain)
+    assert.equal(isDomainRegistered, false)
   })
 })

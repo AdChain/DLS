@@ -115,6 +115,28 @@ contract ADSR {
   }
 
   /*
+   * Check if publisher is registered
+   */
+  function isRegisteredPublisher(address id) external constant returns (bool) {
+    if (publishers[id].id != 0) {
+      return true;
+    }
+
+    return false;
+  }
+
+  /*
+   * Check if publisher is registered by domain
+   */
+  function isRegisteredPublisherDomain(string domain) external constant returns (bool) {
+    if (domainPublisher[sha3(domain)] != 0) {
+      return true;
+    }
+
+    return false;
+  }
+
+  /*
    * Once registered, publishers are free to add certified sellers.
    */
   function addSeller(string sellerDomain, string sellerId, Relationship sellerRel, string sellerTagId) external {
