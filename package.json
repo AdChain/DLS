@@ -23,5 +23,8 @@
   "bugs": {
     "url": "https://github.com/AdChain/ADSR/issues"
   },
-  "homepage": "https://github.com/AdChain/ADSR#readme"
+  "homepage": "https://github.com/AdChain/ADSR#readme",
+  "devDependencies": {
+    "solidity-sha3": "^0.4.1"
+  }
 }

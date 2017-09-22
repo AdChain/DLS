@@ -1,4 +1,5 @@
 const ADSR = artifacts.require('./ADSR.sol')
+const sha3 = require('solidity-sha3').default
 
 const Relationship = {
   Direct: 0,
@@ -21,6 +22,9 @@ contract('ADSR', function (accounts) {
     assert.equal(id2, id)
     assert.equal(domain2, domain)
     assert.equal(name2, name)
+
+    const id3 = await instance.domainPublisher.call(sha3(domain))
+    assert.equal(id3, id)
   })
 
   it('should add seller to publisher sellers', async () => {
@@ -59,8 +63,11 @@ contract('ADSR', function (accounts) {
     const publisher = accounts[1]
 
     await instance.deregisterPublisher(publisher, {from: owner})
-    const [id] = await instance.publishers.call(publisher)
+    const [id, domain] = await instance.publishers.call(publisher)
 
     assert.equal(id, 0)
+
+    const id2 = await instance.domainPublisher.call(sha3(domain))
+    assert.equal(id2, 0)
   })
 })

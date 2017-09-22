@@ -30,7 +30,7 @@ contract ADSR {
   }
 
   /*
-   * 1. a mapping of publisher addresses to their profile metadata.
+   * a mapping of publisher addresses to their profile metadata.
    *
    * example
    * "0xabcd" -> Publisher = { address: "0xabcd", string: "nytimes.com", name: "New York Times" }
@@ -39,8 +39,15 @@ contract ADSR {
    */
   mapping (address => Publisher) public publishers;
 
+  /* a mapping of domains to publisher ids;
+   *
+   * example
+   * "nytimes.com" -> "0xabcd"
+   */
+  mapping (bytes32 => address) public domainPublisher;
+
    /*
-    * 2. a mapping of publisher addresses to
+    * a mapping of publisher addresses to
     * their authorized sellers and their data.
     *
     * example
@@ -61,10 +68,10 @@ contract ADSR {
    * Events, when triggered, record logs in the blockchain.
    * Clients can listen on specific events to get fresh data.
    */
-  event PublisherRegistered(address indexed id);
-  event PublisherDeregistered(address indexed id);
-  event SellerAdded(address indexed publisherId, address indexed resellerId);
-  event SellerRemoved(address indexed publisherId, address indexed resellerId);
+  event _PublisherRegistered(address indexed id);
+  event _PublisherDeregistered(address indexed id);
+  event _SellerAdded(address indexed publisherId, address indexed sellerId);
+  event _SellerRemoved(address indexed publisherId, address indexed sellerId);
 
   /*
    * A function modifier which limits execution
@@ -92,15 +99,18 @@ contract ADSR {
    */
   function registerPublisher(address id, string domain, string name) only_owner {
     publishers[id] = Publisher(id, domain, name);
-    PublisherRegistered(id);
+    domainPublisher[sha3(domain)] = id;
+    _PublisherRegistered(id);
   }
 
   /*
    * The owner can also deregister existing publishers.
    */
   function deregisterPublisher(address id) only_owner {
-    PublisherDeregistered(id);
+    string storage domain = publishers[id].domain;
+    delete domainPublisher[sha3(domain)];
     delete publishers[id];
+    _PublisherDeregistered(id);
   }
 
   /*
@@ -119,7 +129,7 @@ contract ADSR {
      */
     if (publishers[msg.sender].id != 0) {
       sellers[msg.sender][id] = Seller(id, domain, rel);
-      SellerAdded(msg.sender, id);
+      _SellerAdded(msg.sender, id);
     }
   }
 
@@ -132,7 +142,7 @@ contract ADSR {
      */
     if (publishers[msg.sender].id != 0) {
       delete sellers[msg.sender][id];
-      SellerRemoved(msg.sender, id);
+      _SellerRemoved(msg.sender, id);
     }
   }
 }
