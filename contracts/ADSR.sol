@@ -97,7 +97,7 @@ contract ADSR {
   /*
    * Only the owner of the contract can register new publishers.
    */
-  function registerPublisher(address id, string domain, string name) only_owner {
+  function registerPublisher(address id, string domain, string name) only_owner external {
     publishers[id] = Publisher(id, domain, name);
     domainPublisher[sha3(domain)] = id;
     _PublisherRegistered(id);
@@ -106,7 +106,7 @@ contract ADSR {
   /*
    * The owner can also deregister existing publishers.
    */
-  function deregisterPublisher(address id) only_owner {
+  function deregisterPublisher(address id) only_owner external {
     string storage domain = publishers[id].domain;
     delete domainPublisher[sha3(domain)];
     delete publishers[id];
@@ -116,7 +116,9 @@ contract ADSR {
   /*
    * Once registered, publishers are free to add certified sellers.
    */
-  function addSeller(address id, string domain, Relationship rel) {
+  function addSeller(address id, string domain, Relationship rel) external {
+    address sender = msg.sender;
+
     /*
      * First, check that this ethereum address
      * is a registered publisher.
@@ -127,22 +129,58 @@ contract ADSR {
      * Note - in Ethereum, mapping values are initiated
      * to all 0s if not set.
      */
-    if (publishers[msg.sender].id != 0) {
-      sellers[msg.sender][id] = Seller(id, domain, rel);
-      _SellerAdded(msg.sender, id);
+    if (publishers[sender].id != 0) {
+      sellers[sender][id] = Seller(id, domain, rel);
+      _SellerAdded(sender, id);
     }
   }
 
   /*
    * Publishers can also remove sellers at will.
    */
-  function removeSeller(address id) {
+  function removeSeller(address id) external {
+    address sender = msg.sender;
+
     /*
      * Check that this ethereum address is a registered publisher.
      */
-    if (publishers[msg.sender].id != 0) {
-      delete sellers[msg.sender][id];
-      _SellerRemoved(msg.sender, id);
+    if (publishers[sender].id != 0) {
+      delete sellers[sender][id];
+      _SellerRemoved(sender, id);
     }
+  }
+
+  /*
+   * Return seller struct for publisher id
+   */
+  function getSellerForPublisher(address id, address sellerId) external constant returns (address, string, uint) {
+    Seller storage seller = sellers[id][sellerId];
+
+    // TODO: better way
+    uint rel = 0;
+
+    if (seller.rel == Relationship.Reseller) {
+      rel = 1;
+    }
+
+    return (seller.id, seller.domain, rel);
+  }
+
+  /*
+   * Return seller struct for publisher domain
+   */
+  function getSellerForPublisherDomain(string domain, address sellerId) external constant returns (address, string, uint) {
+    address publisher = domainPublisher[sha3(domain)];
+
+    Seller storage seller = sellers[publisher][sellerId];
+
+    // TODO: better way
+    uint rel = 0;
+
+    if (seller.rel == Relationship.Reseller) {
+      rel = 1;
+    }
+
+    return (seller.id, seller.domain, rel);
   }
 }

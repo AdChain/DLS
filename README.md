@@ -4,11 +4,29 @@
 
 Proof of concept.
 
-# Install
+# Usage
 
-```bash
-npm install
-```
+Add seller for publisher
+
+**addSeller(sellerId, sellerDomain, sellerRelationship)**
+
+Add seller for publisher
+
+**removeSeller(sellerId)**
+
+Get seller by publisher id
+
+**getSellerForPublisher(publisherId, sellerId)**
+
+Get seller by publisher domain
+
+**getSellerForPublisherDomain(publisherDomain, sellerId)**
+
+Terminology:
+
+ - *sellerId* is also known as *SellerAccountID* in ads.txt
+ - *sellerDomain* is also known as *SSP/Exchange Domain* in ads.txt
+ - *sellerRelationship* is also known as *PaymentsType* in ads.txt
 
 # Test
 

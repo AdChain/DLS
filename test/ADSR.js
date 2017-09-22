@@ -22,9 +22,6 @@ contract('ADSR', function (accounts) {
     assert.equal(id2, id)
     assert.equal(domain2, domain)
     assert.equal(name2, name)
-
-    const id3 = await instance.domainPublisher.call(sha3(domain))
-    assert.equal(id3, id)
   })
 
   it('should add seller to publisher sellers', async () => {
@@ -32,6 +29,7 @@ contract('ADSR', function (accounts) {
 
     const publisher = accounts[1]
     const id = accounts[2]
+    const pubDomain = 'nytimes.com'
     const domain = 'google.com'
     const rel = Relationship.Reseller
 
@@ -42,6 +40,16 @@ contract('ADSR', function (accounts) {
     assert.equal(id2, id)
     assert.equal(domain2, domain)
     assert.equal(rel2, rel)
+
+    const [id3, domain3, rel3] = await instance.getSellerForPublisher.call(publisher, id)
+    assert.equal(id3, id)
+    assert.equal(domain3, domain)
+    assert.equal(rel3, rel)
+
+    const [id4, domain4, rel4] = await instance.getSellerForPublisherDomain.call(pubDomain, id)
+    assert.equal(id4, id)
+    assert.equal(domain4, domain)
+    assert.equal(rel4, rel)
   })
 
   it('should remove seller from publisher sellers', async () => {
