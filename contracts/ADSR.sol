@@ -15,8 +15,8 @@ contract ADSR {
    * This is the equivalent of a single row in ads.txt
    */
   struct Seller {
-    address id; // SellerAccountID
     string domain; // SSP/Exchange Domain
+    string id; // SellerAccountID
     Relationship rel; // PaymentsType
     string tagId; // TAGID - Trustworthy Accountability Group ID
   }
@@ -58,12 +58,12 @@ contract ADSR {
     * Row 1 - reseller1.com, 1293sdf, direct, tagId
     * Row 2 - reseller2.com, 1293sdf, direct, tagId
     */
-  mapping (address => mapping (address => Seller)) public sellers;
+  mapping (address => mapping (bytes32 => Seller)) public sellers;
 
   /*
    * The owner of this contract.
    */
-  address owner;
+  address public owner;
 
   /*
    * Events, when triggered, record logs in the blockchain.
@@ -71,8 +71,8 @@ contract ADSR {
    */
   event _PublisherRegistered(address indexed id);
   event _PublisherDeregistered(address indexed id);
-  event _SellerAdded(address indexed publisherId, address indexed sellerId);
-  event _SellerRemoved(address indexed publisherId, address indexed sellerId);
+  event _SellerAdded(address indexed publisherId, bytes32 indexed sellerId);
+  event _SellerRemoved(address indexed publisherId, bytes32 indexed sellerId);
 
   /*
    * A function modifier which limits execution
@@ -117,7 +117,7 @@ contract ADSR {
   /*
    * Once registered, publishers are free to add certified sellers.
    */
-  function addSeller(address id, string domain, Relationship rel, string tagId) external {
+  function addSeller(string sellerDomain, string sellerId, Relationship sellerRel, string sellerTagId) external {
     address sender = msg.sender;
 
     /*
@@ -131,21 +131,23 @@ contract ADSR {
      * to all 0s if not set.
      */
     if (publishers[sender].id != 0) {
-      sellers[sender][id] = Seller(id, domain, rel, tagId);
-      _SellerAdded(sender, id);
+      bytes32 hash = sha3(sellerDomain, sellerId);
+      sellers[sender][hash] = Seller(sellerDomain, sellerId, sellerRel, sellerTagId);
+      _SellerAdded(sender, hash);
     }
   }
 
   /*
    * Publishers can also remove sellers at will.
    */
-  function removeSeller(address id) external {
+  function removeSeller(string sellerDomain, string sellerId) external {
     address sender = msg.sender;
 
     /*
      * Check that this ethereum address is a registered publisher.
      */
     if (publishers[sender].id != 0) {
+      bytes32 id = sha3(sellerDomain, sellerId);
       delete sellers[sender][id];
       _SellerRemoved(sender, id);
     }
@@ -154,8 +156,9 @@ contract ADSR {
   /*
    * Return seller struct for publisher id
    */
-  function getSellerForPublisher(address id, address sellerId) external constant returns (address, string, uint, string) {
-    Seller storage seller = sellers[id][sellerId];
+  function getSellerForPublisher(address id, string sellerDomain, string sellerId) external constant returns (string, string, uint, string) {
+    bytes32 hash = sha3(sellerDomain, sellerId);
+    Seller storage seller = sellers[id][hash];
 
     // TODO: better way
     uint rel = 0;
@@ -164,16 +167,17 @@ contract ADSR {
       rel = 1;
     }
 
-    return (seller.id, seller.domain, rel, seller.tagId);
+    return (seller.domain, seller.id, rel, seller.tagId);
   }
 
   /*
    * Return seller struct for publisher domain
    */
-  function getSellerForPublisherDomain(string domain, address sellerId) external constant returns (address, string, uint, string) {
-    address publisher = domainPublisher[sha3(domain)];
+  function getSellerForPublisherDomain(string publisherDomain, string sellerDomain, string sellerId) external constant returns (string, string, uint, string) {
+    address publisher = domainPublisher[sha3(publisherDomain)];
 
-    Seller storage seller = sellers[publisher][sellerId];
+    bytes32 hash = sha3(sellerDomain, sellerId);
+    Seller storage seller = sellers[publisher][hash];
 
     // TODO: better way
     uint rel = 0;
@@ -182,6 +186,6 @@ contract ADSR {
       rel = 1;
     }
 
-    return (seller.id, seller.domain, rel, seller.tagId);
+    return (seller.domain, seller.id, rel, seller.tagId);
   }
 }

@@ -1,7 +1,7 @@
 {
   "name": "adsr",
   "version": "0.0.1",
-  "description": "> [ads.txt](https://iabtechlab.com/ads-txt/) - on the blockchain.",
+  "description": "it's ads.txt, on the blockchain",
   "main": "index.js",
   "directories": {
     "test": "test"
@@ -9,7 +9,10 @@
   "scripts": {
     "test": "truffle test",
     "compile": "truffle compile",
-    "deploy": "truffle migrate --reset"
+    "deploy": "truffle migrate --reset",
+    "deploy:rinkeby": "truffle migrate --reset --network=rinkeby",
+    "watch:app": "watchify -t [babelify] app/src/index.js -o app/public/dist/bundle.js",
+    "build:app": "browserify -t [babelify] app/src/index.js -o app/public/dist/bundle.js"
   },
   "repository": {
     "type": "git",
@@ -25,6 +28,13 @@
   },
   "homepage": "https://github.com/AdChain/ADSR#readme",
   "devDependencies": {
-    "solidity-sha3": "^0.4.1"
-  }
+    "babelify": "^7.3.0",
+    "browserify": "^14.4.0",
+    "ethereumjs-abi": "^0.6.4",
+    "solidity-sha3": "^0.4.1",
+    "truffle-contract": "^3.0.0",
+    "truffle-hdwallet-provider": "0.0.3",
+    "watchify": "^3.9.0"
+  },
+  "dependencies": {}
 }

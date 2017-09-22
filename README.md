@@ -2,25 +2,27 @@
 
 > [ads.txt](https://iabtechlab.com/ads-txt/) - on the blockchain.
 
-Proof of concept.
+Rinkeby Address
+
+https://rinkeby.etherscan.io/address/0x343c82f96358e0bac16845fb718ea1d44e107270
 
 # Usage
 
 Add seller for publisher
 
-**addSeller(sellerId, sellerDomain, sellerRelationship, sellerTagId)**
+**addSeller(sellerDomain, sellerId, sellerRelationship, sellerTAGID)**
 
 Add seller for publisher
 
-**removeSeller(sellerId)**
+**removeSeller(sellerDomain, sellerId)**
 
 Get seller for publisher id
 
-**getSellerForPublisher(publisherId, sellerId)**
+**getSellerForPublisher(publisherId, sellerDomain, sellerId)**
 
 Get seller for publisher domain
 
-**getSellerForPublisherDomain(publisherDomain, sellerId)**
+**getSellerForPublisherDomain(publisherDomain, sellerDomain, sellerId)**
 
 Terminology:
 
@@ -38,6 +40,8 @@ truffle test
 # Resources
 
 - [Ads.txt – Authorized Digital Sellers](https://iabtechlab.com/ads-txt/)
+
+- [About Ads.txt](https://iabtechlab.com/ads-txt-about/)
 
 - [truffle framework](https://github.com/trufflesuite/truffle)
 

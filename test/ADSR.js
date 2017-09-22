@@ -1,5 +1,6 @@
 const ADSR = artifacts.require('./ADSR.sol')
 const sha3 = require('solidity-sha3').default
+const {soliditySHA3} = require('ethereumjs-abi')
 
 const Relationship = {
   Direct: 0,
@@ -34,20 +35,25 @@ contract('ADSR', function (accounts) {
     const rel = Relationship.Reseller
     const tagId = ''
 
-    await instance.addSeller(id, domain, rel, tagId, {from: publisher})
+    await instance.addSeller(domain, id, rel, tagId, {from: publisher})
 
-    const [id2, domain2, rel2] = await instance.sellers.call(publisher, id)
+
+    /*
+    // can't figure how to generate proper hash to test this
+    const hash = soliditySHA3(['string', 'string'], [domain, id]).toString('hex')
+    const [domain2, id2, rel2] = await instance.sellers.call(publisher, hash)
 
     assert.equal(id2, id)
     assert.equal(domain2, domain)
     assert.equal(rel2, rel)
+    */
 
-    const [id3, domain3, rel3] = await instance.getSellerForPublisher.call(publisher, id)
+    const [domain3, id3, rel3] = await instance.getSellerForPublisher.call(publisher, domain, id)
     assert.equal(id3, id)
     assert.equal(domain3, domain)
     assert.equal(rel3, rel)
 
-    const [id4, domain4, rel4] = await instance.getSellerForPublisherDomain.call(pubDomain, id)
+    const [domain4, id4, rel4] = await instance.getSellerForPublisherDomain.call(pubDomain, domain, id)
     assert.equal(id4, id)
     assert.equal(domain4, domain)
     assert.equal(rel4, rel)
@@ -58,10 +64,11 @@ contract('ADSR', function (accounts) {
 
     const publisher = accounts[1]
     const id = accounts[2]
+    const domain = 'nytimes.com'
 
-    await instance.removeSeller(id, {from: publisher})
+    await instance.removeSeller(domain, id, {from: publisher})
 
-    const [id2] = await instance.sellers.call(publisher, id)
+    const [domain2, id2] = await instance.sellers.call(publisher, id)
 
     assert.equal(id2, 0)
   })
