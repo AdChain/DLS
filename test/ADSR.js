@@ -32,8 +32,9 @@ contract('ADSR', function (accounts) {
     const pubDomain = 'nytimes.com'
     const domain = 'google.com'
     const rel = Relationship.Reseller
+    const tagId = ''
 
-    await instance.addSeller(id, domain, rel, {from: publisher})
+    await instance.addSeller(id, domain, rel, tagId, {from: publisher})
 
     const [id2, domain2, rel2] = await instance.sellers.call(publisher, id)
 

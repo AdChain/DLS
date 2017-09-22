@@ -8,17 +8,17 @@ Proof of concept.
 
 Add seller for publisher
 
-**addSeller(sellerId, sellerDomain, sellerRelationship)**
+**addSeller(sellerId, sellerDomain, sellerRelationship, sellerTagId)**
 
 Add seller for publisher
 
 **removeSeller(sellerId)**
 
-Get seller by publisher id
+Get seller for publisher id
 
 **getSellerForPublisher(publisherId, sellerId)**
 
-Get seller by publisher domain
+Get seller for publisher domain
 
 **getSellerForPublisherDomain(publisherDomain, sellerId)**
 
@@ -27,6 +27,7 @@ Terminology:
  - *sellerId* is also known as *SellerAccountID* in ads.txt
  - *sellerDomain* is also known as *SSP/Exchange Domain* in ads.txt
  - *sellerRelationship* is also known as *PaymentsType* in ads.txt
+ - *sellerTagId* is also known as *TAGID* in ads.txt
 
 # Test
 

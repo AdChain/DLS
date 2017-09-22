@@ -15,9 +15,10 @@ contract ADSR {
    * This is the equivalent of a single row in ads.txt
    */
   struct Seller {
-    address id;
-    string domain;
-    Relationship rel;
+    address id; // SellerAccountID
+    string domain; // SSP/Exchange Domain
+    Relationship rel; // PaymentsType
+    string tagId; // TAGID - Trustworthy Accountability Group ID
   }
 
   /*
@@ -116,7 +117,7 @@ contract ADSR {
   /*
    * Once registered, publishers are free to add certified sellers.
    */
-  function addSeller(address id, string domain, Relationship rel) external {
+  function addSeller(address id, string domain, Relationship rel, string tagId) external {
     address sender = msg.sender;
 
     /*
@@ -130,7 +131,7 @@ contract ADSR {
      * to all 0s if not set.
      */
     if (publishers[sender].id != 0) {
-      sellers[sender][id] = Seller(id, domain, rel);
+      sellers[sender][id] = Seller(id, domain, rel, tagId);
       _SellerAdded(sender, id);
     }
   }
@@ -153,7 +154,7 @@ contract ADSR {
   /*
    * Return seller struct for publisher id
    */
-  function getSellerForPublisher(address id, address sellerId) external constant returns (address, string, uint) {
+  function getSellerForPublisher(address id, address sellerId) external constant returns (address, string, uint, string) {
     Seller storage seller = sellers[id][sellerId];
 
     // TODO: better way
@@ -163,13 +164,13 @@ contract ADSR {
       rel = 1;
     }
 
-    return (seller.id, seller.domain, rel);
+    return (seller.id, seller.domain, rel, seller.tagId);
   }
 
   /*
    * Return seller struct for publisher domain
    */
-  function getSellerForPublisherDomain(string domain, address sellerId) external constant returns (address, string, uint) {
+  function getSellerForPublisherDomain(string domain, address sellerId) external constant returns (address, string, uint, string) {
     address publisher = domainPublisher[sha3(domain)];
 
     Seller storage seller = sellers[publisher][sellerId];
@@ -181,6 +182,6 @@ contract ADSR {
       rel = 1;
     }
 
-    return (seller.id, seller.domain, rel);
+    return (seller.id, seller.domain, rel, seller.tagId);
   }
 }
