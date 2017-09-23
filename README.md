@@ -1,4 +1,4 @@
-# ADSR - Authorized Digital Sellers Registry
+# DLS - Distributed List of Sellers
 
 > [ads.txt](https://iabtechlab.com/ads-txt/) - on the blockchain.
 

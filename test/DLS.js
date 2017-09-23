@@ -1,4 +1,4 @@
-const ADSR = artifacts.require('./ADSR.sol')
+const DLS = artifacts.require('./DLS.sol')
 const sha3 = require('solidity-sha3').default
 const {soliditySHA3} = require('ethereumjs-abi')
 
@@ -7,11 +7,11 @@ const Relationship = {
   Reseller: 1
 }
 
-contract('ADSR', function (accounts) {
+contract('DLS', function (accounts) {
   const owner = accounts[0]
 
   it('should add publisher to registry', async () => {
-    const instance = await ADSR.deployed()
+    const instance = await DLS.deployed()
 
     const id = accounts[1]
     const domain = 'nytimes.com'
@@ -38,7 +38,7 @@ contract('ADSR', function (accounts) {
   })
 
   it('should add seller to publisher sellers', async () => {
-    const instance = await ADSR.deployed()
+    const instance = await DLS.deployed()
 
     const publisher = accounts[1]
     const id = accounts[2]
@@ -72,7 +72,7 @@ contract('ADSR', function (accounts) {
   })
 
   it('should remove seller from publisher sellers', async () => {
-    const instance = await ADSR.deployed()
+    const instance = await DLS.deployed()
 
     const publisher = accounts[1]
     const id = accounts[2]
@@ -86,7 +86,7 @@ contract('ADSR', function (accounts) {
   })
 
   it('should deregister publisher from registry', async () => {
-    const instance = await ADSR.deployed()
+    const instance = await DLS.deployed()
 
     const publisher = accounts[1]
     const domain = 'nytimes.com'

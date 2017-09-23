@@ -1,6 +1,6 @@
 const tc = require('truffle-contract')
 
-const ADSR = require('../../build/contracts/ADSR.json')
+const source = require('../../build/contracts/ADSR.json')
 let instance = null
 let account = null
 
@@ -88,7 +88,7 @@ async function getSeller (pubDomain, sellerDomain, sellerId) {
 
 async function main () {
 
-  const contract = tc(ADSR)
+  const contract = tc(source)
   contract.setProvider(web3.currentProvider)
   instance = await contract.deployed()
   account = web3.eth.accounts[0]

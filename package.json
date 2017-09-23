@@ -1,5 +1,5 @@
 {
-  "name": "adsr",
+  "name": "dls",
   "version": "0.0.1",
   "description": "it's ads.txt, on the blockchain",
   "main": "index.js",

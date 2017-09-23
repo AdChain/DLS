@@ -1,6 +1,6 @@
 pragma solidity ^0.4.4;
 
-contract ADSR {
+contract DLS {
   /*
    * A container for publisher profile metadata.
    */
@@ -91,7 +91,7 @@ contract ADSR {
    * The constructor function, called only
    * once when this contract is initially deployed.
    */
-  function ADSR() {
+  function DLS() {
     owner = msg.sender;
   }
 
