@@ -143,6 +143,17 @@ getSellerForm.addEventListener('submit', async event => {
   }
 })
 
+function setUpEvents () {
+  instance.allEvents()
+  .watch((error, log) => {
+    if (error) {
+      console.error(error)
+      return false
+    }
+    console.log(log)
+  })
+}
+
 const addr = '0x3b69D38EE4040d118F30F8ad21660FC0CA3769cC'
 const domain = 'nytimes.com'
 const name = 'New York Times'
@@ -156,4 +167,5 @@ setTimeout(async () => {
 
   //addPublisher(addr, domain, name)
   getPublisherData()
+  setUpEvents()
 }, 1e3)
