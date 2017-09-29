@@ -9,7 +9,7 @@
   "scripts": {
     "test": "truffle test",
     "compile": "truffle compile",
-    "deploy": "truffle migrate --reset",
+    "deploy": "truffle migrate --reset --network=development",
     "deploy:rinkeby": "truffle migrate --reset --network=rinkeby",
     "watch:app": "watchify -t [babelify] app/src/index.js -o app/public/dist/bundle.js",
     "build:app": "browserify -t [babelify] app/src/index.js -o app/public/dist/bundle.js"

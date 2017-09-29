@@ -10,27 +10,27 @@ https://rinkeby.etherscan.io/address/0x343c82f96358e0bac16845fb718ea1d44e107270
 
 Check if publisher is in registry
 
-**isRegisteredPublisher(publisherId)**
+- **isRegisteredPublisher(publisherId)**
 
 Check if publisher is in registry by publisher domain
 
-**isRegisteredPublisherDomain(publisherDomain)**
+- **isRegisteredPublisherDomain(publisherDomain)**
 
 Add seller for publisher
 
-**addSeller(sellerDomain, sellerId, sellerRelationship, sellerTAGID)**
+- **addSeller(sellerDomain, sellerId, sellerRelationship, sellerTAGID)**
 
 Add seller for publisher
 
-**removeSeller(sellerDomain, sellerId)**
+- **removeSeller(sellerDomain, sellerId)**
 
 Get seller for publisher id
 
-**getSellerForPublisher(publisherId, sellerDomain, sellerId)**
+- **getSellerForPublisher(publisherId, sellerDomain, sellerId)**
 
 Get seller for publisher domain
 
-**getSellerForPublisherDomain(publisherDomain, sellerDomain, sellerId)**
+- **getSellerForPublisherDomain(publisherDomain, sellerDomain, sellerId)**
 
 Terminology:
 

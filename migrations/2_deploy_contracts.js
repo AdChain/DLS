@@ -1,5 +1,5 @@
-var ADSR = artifacts.require("./ADSR.sol");
+var DLS = artifacts.require('./DLS.sol')
 
 module.exports = function(deployer) {
-  deployer.deploy(ADSR);
-};
+  deployer.deploy(DLS)
+}

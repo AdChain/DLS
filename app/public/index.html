@@ -24,7 +24,7 @@
   <div class="Account">
     <br />
     <br />
-    <label>Connected publisher account</label>
+    <label>Connected publisher account via MetaMask:</label>
     <div class="PublisherInfo">-</div>
     <br />
     <br />
@@ -57,9 +57,15 @@
   <form class="GetSellerForm">
     <div>
       <label>Get Seller / Check if has seller</label>
+      <div>
       <input type="text" name="publisherDomain" placeholder="pub domain" />
+      </div>
+      <div>
       <input type="text" name="sellerDomain" placeholder="seller domain" />
+      </div>
+      <div>
       <input type="text" name="sellerId" placeholder="seller id" />
+      </div>
     </div>
     <div>
       <button type="submit">Get Seller</button>
@@ -72,6 +78,7 @@
   <br />
   <br />
 
+  <script src="/vendor/web3.min.js"></script>
   <script src="/dist/bundle.js"></script>
 </body>
 </html>

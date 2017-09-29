@@ -107,4 +107,32 @@ contract('DLS', function (accounts) {
     const isDomainRegistered = await instance.isRegisteredPublisherDomain(domain)
     assert.equal(isDomainRegistered, false)
   })
+
+  it('should be able to change owner if owner', async () => {
+    const instance = await DLS.deployed()
+
+    const owner = await instance.owner.call()
+    assert.equal(owner, accounts[0])
+
+    const newOwner = accounts[1]
+    await instance.changeOwner(newOwner)
+    const owner2 = await instance.owner.call()
+    assert.equal(owner2, newOwner)
+  })
+
+  it('should not be able to change owner if not owner', async () => {
+    const instance = await DLS.deployed()
+
+    const owner = await instance.owner.call()
+    assert.equal(owner, accounts[1])
+
+    const newOwner = accounts[2]
+    try {
+      await instance.changeOwner(newOwner, {from: accounts[0]})
+      const owner2 = await instance.owner.call()
+      assert.notEqual(owner2, newOwner)
+    } catch (error) {
+      assert.notEqual(error, undefined)
+    }
+  })
 })

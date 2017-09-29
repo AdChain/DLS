@@ -95,6 +95,13 @@ contract DLS {
     owner = msg.sender;
   }
 
+  /**
+   * Change owner of contract.
+   */
+  function changeOwner(address newOwner) only_owner external {
+    owner =  newOwner;
+  }
+
   /*
    * Only the owner of the contract can register new publishers.
    */

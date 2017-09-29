@@ -1,6 +1,8 @@
+// TODO: use react
+
 const tc = require('truffle-contract')
 
-const source = require('../../build/contracts/ADSR.json')
+const source = require('../../build/contracts/DLS.json')
 let instance = null
 let account = null
 
@@ -45,8 +47,7 @@ async function getPublisherData () {
   }
 }
 
-async function addSeller (domain, id, rel) {
-  const tagId = ''
+async function addSeller (domain, id, rel, tagId) {
   try {
     await instance.addSeller(domain, id, rel, tagId, {from: account})
     alert('added seller')
@@ -56,9 +57,8 @@ async function addSeller (domain, id, rel) {
 }
 
 async function removeSeller (domain, id) {
-  const tagId = ''
   try {
-    await instance.addSeller(domain, id, {from: account})
+    await instance.removeSeller(domain, id, {from: account})
     alert('removed seller')
   } catch (error) {
     alert(error)
@@ -68,7 +68,7 @@ async function removeSeller (domain, id) {
 async function getSeller (pubDomain, sellerDomain, sellerId) {
   const tagId = ''
   try {
-    let [dom, sid, rel, tagId] = await instance.getSellerForPublisherDomain(pubDomain, sellerDomain, sellerId, {from: account})
+    let [domain, sid, rel, tagId] = await instance.getSellerForPublisherDomain(pubDomain, sellerDomain, sellerId, {from: account})
 
     if (rel.toNumber() === 1) {
       rel = 'reseller'
@@ -76,8 +76,8 @@ async function getSeller (pubDomain, sellerDomain, sellerId) {
       rel = 'direct'
     }
 
-    if (dom) {
-      sellerInfo.innerHTML = `<div>${dom}</div><div>${sid}</div><div>${rel}</div><div>${tagId}</div>`
+    if (domain) {
+      sellerInfo.innerHTML = `<div>is a seller</div><div>${domain}</div><div>${sid}</div><div>${rel}</div><div>${tagId}</div>`
     } else {
       sellerInfo.innerHTML = `<div>not a seller</div>`
     }
@@ -86,12 +86,29 @@ async function getSeller (pubDomain, sellerDomain, sellerId) {
   }
 }
 
+function getProvider () {
+  if (window.web3) {
+    return window.web3.currentProvider
+  }
+
+  const providerUrl = 'https://rinkeby.infura.io:443'
+  const provider = new window.Web3.providers.HttpProvider(providerUrl)
+
+  return provider
+}
+
+function getAccount () {
+  if (window.web3) {
+    return window.web3.defaultAccount || window.web3.eth.accounts[0]
+  }
+}
+
 async function main () {
 
   const contract = tc(source)
-  contract.setProvider(web3.currentProvider)
+  contract.setProvider(getProvider())
   instance = await contract.deployed()
-  account = web3.eth.accounts[0]
+  account = getAccount()
 }
 
 
@@ -99,11 +116,12 @@ addSellerForm.addEventListener('submit', event => {
   event.preventDefault()
   const {target} = event
 
-  let [domain, id, rel] = target.seller.value.split(',')
+  let [domain, id, rel, tagId] = target.seller.value.split(',')
 
   domain = domain.trim().toLowerCase()
-  id = id.trim()
-  rel = rel.trim().toLowerCase()
+  id = (id && id.trim()) || ''
+  rel = (rel && rel.trim().toLowerCase()) || ''
+  tagId = (tagId && tagId.trim()) || ''
 
   if (rel === 'reseller') {
     rel = 1
@@ -111,7 +129,7 @@ addSellerForm.addEventListener('submit', event => {
     rel = 0
   }
 
-  addSeller(domain, id, rel)
+  addSeller(domain, id, rel, tagId)
 })
 
 removeSellerForm.addEventListener('submit', event => {
@@ -159,13 +177,13 @@ const domain = 'nytimes.com'
 const name = 'New York Times'
 
 setTimeout(async () => {
-  if (!window.web3) {
-    alert('Please install metamask')
-  }
-
   await main()
 
-  //addPublisher(addr, domain, name)
-  getPublisherData()
-  setUpEvents()
+  if (getAccount()) {
+    //addPublisher(addr, domain, name)
+    getPublisherData()
+    setUpEvents()
+  } else {
+    publisherInfo.innerHTML = `Please install MetaMask to update your list of sellers`
+  }
 }, 1e3)

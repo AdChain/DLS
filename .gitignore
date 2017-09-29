@@ -3,3 +3,4 @@ build/*
 secrets.json
 *.swp
 .DS_Store
+deploy.sh
