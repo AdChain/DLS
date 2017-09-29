@@ -11,8 +11,23 @@
   </style>
 </head>
 <body>
-  Register Domain
+  <h1>DLS - Register Domain</h1>
   <div>
+
+  Make sure to have these DNS TXT records hostnames;
+  <code>dlspubkey</code> (eth public key) and optional <code>dlsname</code> (site name)
+
+  <div>Example</div>
+  <pre>
+  dlspubkey.example.com = "0x123...abc"
+
+  dlsname.example.com = "My Website Name"
+  </pre>
+
+  <div>
+  Once you've done that, enter your domain and submit
+  </div>
+
   <form id="RegisterForm">
     <div>
       <input type="text" name="domain" placeholder="example.com">

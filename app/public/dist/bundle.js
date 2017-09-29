@@ -37,7 +37,7 @@ async function getPublisherData() {
     const [id, domain, name] = await instance.publishers.call(account, { from: account });
 
     if (parseInt(id, 16) === 0) {
-      publisherInfo.innerHTML = `This account is not tied to a domain. Learn how to set up <a href="register.html">here</a>.`;
+      publisherInfo.innerHTML = `This account is not tied to a domain. Learn how to set up <a href="/register">here</a>.`;
       return false;
     }
 
