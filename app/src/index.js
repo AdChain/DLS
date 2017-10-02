@@ -66,7 +66,6 @@ async function removeSeller (domain, id) {
 }
 
 async function getSeller (pubDomain, sellerDomain, sellerId) {
-  const tagId = ''
   try {
     let [domain, sid, rel, tagId] = await instance.getSellerForPublisherDomain(pubDomain, sellerDomain, sellerId, {from: account})
 
@@ -157,7 +156,7 @@ getSellerForm.addEventListener('submit', async event => {
   if (registered) {
     getSeller(pubDomain, sellerDomain, sellerId)
   } else {
-    sellerInfo.innerHTML = `<div>publisher is not in registry</div>`
+    sellerInfo.innerHTML = `<div>publisher is not in DLS</div>`
   }
 })
 
