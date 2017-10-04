@@ -160,14 +160,35 @@ getSellerForm.addEventListener('submit', async event => {
   }
 })
 
+const logs = document.querySelector('#logs')
+
 function setUpEvents () {
   instance.allEvents()
-  .watch((error, log) => {
+  .watch(async (error, log) => {
     if (error) {
       console.error(error)
       return false
     }
     console.log(log)
+
+
+    const name = log.event
+    const pub = log.args.publisherId
+    const hash = log.args.sellerId
+
+    if (pub && hash) {
+      let [domain, id, rel] = await instance.sellers.call(pub, hash)
+
+    if (rel.toNumber() === 1) {
+      rel = 'reseller'
+    } else {
+      rel = 'direct'
+    }
+
+      logs.innerHTML += `<li>${name} ${pub} ${domain} ${id} ${rel}</li>`
+    }
+
+
   })
 }
 

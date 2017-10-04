@@ -12,7 +12,8 @@
     "deploy": "truffle migrate --reset --network=development",
     "deploy:rinkeby": "truffle migrate --reset --network=rinkeby",
     "watch:app": "watchify -t [babelify] app/src/index.js -o app/public/dist/bundle.js",
-    "build:app": "browserify -t [babelify] app/src/index.js -o app/public/dist/bundle.js"
+    "build:app": "browserify -t [babelify] app/src/index.js -o app/public/dist/bundle.js",
+    "docs": "doxity build"
   },
   "repository": {
     "type": "git",
@@ -28,6 +29,7 @@
   },
   "homepage": "https://github.com/AdChain/ADSR#readme",
   "devDependencies": {
+    "@digix/doxity": "^0.5.2",
     "babelify": "^7.3.0",
     "browserify": "^14.4.0",
     "ethereumjs-abi": "^0.6.4",

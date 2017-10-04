@@ -4,35 +4,13 @@
 
 Rinkeby Address
 
-https://rinkeby.etherscan.io/address/0x343c82f96358e0bac16845fb718ea1d44e107270
+https://rinkeby.etherscan.io/address/0x7f4d7db212f7f3d11f7cbc54ab36a17bbb196e3a
 
-# Usage
+# Documentation
 
-Check if publisher is in registry
+[https://dls.adchain.com/docs/DLS](https://dls.adchain.com/docs/DLS)
 
-- **isRegisteredPublisher(publisherId)**
-
-Check if publisher is in registry by publisher domain
-
-- **isRegisteredPublisherDomain(publisherDomain)**
-
-Add seller for publisher
-
-- **addSeller(sellerDomain, sellerId, sellerRelationship, sellerTAGID)**
-
-Add seller for publisher
-
-- **removeSeller(sellerDomain, sellerId)**
-
-Get seller for publisher id
-
-- **getSellerForPublisher(publisherId, sellerDomain, sellerId)**
-
-Get seller for publisher domain
-
-- **getSellerForPublisherDomain(publisherDomain, sellerDomain, sellerId)**
-
-Terminology:
+## Terminology
 
  - *sellerId* is also known as *SellerAccountID* in ads.txt
  - *sellerDomain* is also known as *SSP/Exchange Domain* in ads.txt
