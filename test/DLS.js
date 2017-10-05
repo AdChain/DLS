@@ -101,9 +101,9 @@ contract('DLS', function (accounts) {
     const eventObj = await getLastEvent(instance)
     assert.equal(eventObj.event, '_SellerAdded')
 
-    const hash = `0x${soliditySHA3(['string', 'string', 'uint8'], [sellerDomain, sellerId, rel]).toString('hex')}`
+    const sellerHash = `0x${soliditySHA3(['string', 'string', 'uint8'], [sellerDomain, sellerId, rel]).toString('hex')}`
     const domainHash = `0x${soliditySHA3(['bytes32'], [pubDomain]).toString('hex')}`
-    const [sellerDomain2, sellerId2, rel2] = await instance.sellers.call(domainHash, hash)
+    const [sellerDomain2, sellerId2, rel2] = await instance.sellers.call(domainHash, sellerHash)
 
     assert.equal(sellerId2, sellerId)
     assert.equal(sellerDomain2, sellerDomain)

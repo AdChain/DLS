@@ -34,9 +34,14 @@
     "browserify": "^14.4.0",
     "ethereumjs-abi": "^0.6.4",
     "solidity-sha3": "^0.4.1",
+    "standard": "^10.0.3",
     "truffle-contract": "^3.0.0",
     "truffle-hdwallet-provider": "0.0.3",
     "watchify": "^3.9.0"
   },
-  "dependencies": {}
+  "dependencies": {
+    "ethereumjs-abi": "^0.6.4",
+    "h": "^0.1.0",
+    "hex2ascii": "0.0.2"
+  }
 }

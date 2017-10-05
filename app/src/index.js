@@ -1,8 +1,12 @@
 // TODO: use react
 
 const tc = require('truffle-contract')
+const { soliditySHA3 } = require('ethereumjs-abi')
+const hex2ascii = require('hex2ascii')
+const h = require('h')
 
 const source = require('../../build/contracts/DLS.json')
+
 let instance = null
 let account = null
 
@@ -11,16 +15,7 @@ const sellerInfo = document.querySelector('.SellerInfo')
 const addSellerForm = document.querySelector('.AddSellerForm')
 const removeSellerForm = document.querySelector('.RemoveSellerForm')
 const getSellerForm = document.querySelector('.GetSellerForm')
-
-
-async function addPublisher (address, domain, name) {
-  try {
-    await instance.registerPublisher(address, domain, name, {from: account})
-    alert('added')
-  } catch (error) {
-    alert(error)
-  }
-}
+const logs = document.querySelector('#logs')
 
 async function isRegisteredPublisher (domain) {
   try {
@@ -34,49 +29,55 @@ async function isRegisteredPublisher (domain) {
 
 async function getPublisherData () {
   try {
-    const [id, domain, name] = await instance.publishers.call(account, {from: account})
+    let domain = await instance.domains.call(account, {from: account})
+    domain = hex2ascii(domain)
 
-    if (parseInt(id, 16) === 0) {
+    if (!domain) {
       publisherInfo.innerHTML = `This account is not tied to a domain. Learn how to set up <a href="/register">here</a>.`
       return false
     }
 
-    publisherInfo.innerHTML = `<div>address: ${id}</div><div>domain: ${domain}</div><div>name: ${name}</div>`
+   const dom = h('div', h('div', `account: ${account}`), h('div', `domain: ${domain}`))
+
+    publisherInfo.innerHTML = ''
+    publisherInfo.appendChild(dom)
   } catch (error) {
     alert(error)
   }
 }
 
-async function addSeller (domain, id, rel, tagId) {
+async function addSeller (sellerDomain, sellerId, sellerRel, tagId) {
   try {
-    await instance.addSeller(domain, id, rel, tagId, {from: account})
+    await instance.addSeller(sellerDomain, sellerId, sellerRel, tagId, {from: account})
     alert('added seller')
   } catch (error) {
     alert(error)
   }
 }
 
-async function removeSeller (domain, id) {
+async function removeSeller (sellerDomain, sellerId, sellerRel) {
   try {
-    await instance.removeSeller(domain, id, {from: account})
+    await instance.removeSeller(sellerDomain, sellerId, sellerRel, {from: account})
     alert('removed seller')
   } catch (error) {
     alert(error)
   }
 }
 
-async function getSeller (pubDomain, sellerDomain, sellerId) {
+async function getSeller (pubDomain, sellerDomain, sellerId, sellerRel) {
   try {
-    let [domain, sid, rel, tagId] = await instance.getSellerForPublisherDomain(pubDomain, sellerDomain, sellerId, {from: account})
+    const sellerHash = `0x${soliditySHA3(['string', 'string', 'uint8'], [sellerDomain, sellerId, sellerRel]).toString('hex')}`
+    const domainHash = `0x${soliditySHA3(['bytes32'], [pubDomain]).toString('hex')}`
+    let [sdomain, sid, srel, tagId] = await instance.sellers.call(domainHash, sellerHash)
 
-    if (rel.toNumber() === 1) {
-      rel = 'reseller'
+    if (srel.toNumber() === 1) {
+      srel = 'direct'
     } else {
-      rel = 'direct'
+      srel = 'reseller'
     }
 
-    if (domain) {
-      sellerInfo.innerHTML = `<div>is a seller</div><div>${domain}</div><div>${sid}</div><div>${rel}</div><div>${tagId}</div>`
+    if (sdomain) {
+      sellerInfo.innerHTML = `<div>is a seller</div><div>${sdomain}</div><div>${sid}</div><div>${srel}</div><div>${tagId}</div>`
     } else {
       sellerInfo.innerHTML = `<div>not a seller</div>`
     }
@@ -102,16 +103,7 @@ function getAccount () {
   }
 }
 
-async function main () {
-
-  const contract = tc(source)
-  contract.setProvider(getProvider())
-  instance = await contract.deployed()
-  account = getAccount()
-}
-
-
-addSellerForm.addEventListener('submit', event => {
+function onAddSellerSubmit (event) {
   event.preventDefault()
   const {target} = event
 
@@ -122,45 +114,57 @@ addSellerForm.addEventListener('submit', event => {
   rel = (rel && rel.trim().toLowerCase()) || ''
   tagId = (tagId && tagId.trim()) || ''
 
-  if (rel === 'reseller') {
+  if (rel === 'direct') {
     rel = 1
   } else {
-    rel = 0
+    rel = 2
   }
 
   addSeller(domain, id, rel, tagId)
-})
+}
 
-removeSellerForm.addEventListener('submit', event => {
+function onRemoveSellerSubmit (event) {
   event.preventDefault()
   const {target} = event
 
-  let [domain, id] = target.seller.value.split(',')
+  let [sellerDomain, sellerId, sellerRel] = target.seller.value.split(',')
 
-  domain = domain.trim().toLowerCase()
-  id = id.trim()
+  sellerDomain = sellerDomain.trim().toLowerCase()
+  sellerId = sellerId.trim()
+  sellerRel = (sellerRel && sellerRel.trim().toLowerCase()) || ''
 
-  removeSeller(domain, id)
-})
+  if (sellerRel === 'direct') {
+    sellerRel = 1
+  } else {
+    sellerRel = 2
+  }
 
-getSellerForm.addEventListener('submit', async event => {
+  removeSeller(sellerDomain, sellerId, sellerRel)
+}
+
+async function onGetSellerSubmit (event) {
   event.preventDefault()
   const {target} = event
 
   const pubDomain = target.publisherDomain.value.trim()
   const sellerDomain = target.sellerDomain.value.trim()
   const sellerId = target.sellerId.value.trim()
+  let sellerRel = target.sellerRel.value.toLowerCase().trim()
+
+  if (sellerRel === 'direct') {
+    sellerRel = 1
+  } else {
+    sellerRel = 2
+  }
 
   const registered = await isRegisteredPublisher(pubDomain)
 
   if (registered) {
-    getSeller(pubDomain, sellerDomain, sellerId)
+    getSeller(pubDomain, sellerDomain, sellerId, sellerRel)
   } else {
     sellerInfo.innerHTML = `<div>publisher is not in DLS</div>`
   }
-})
-
-const logs = document.querySelector('#logs')
+}
 
 function setUpEvents () {
   instance.allEvents()
@@ -171,39 +175,34 @@ function setUpEvents () {
     }
     console.log(log)
 
-
     const name = log.event
-    const pub = log.args.publisherId
-    const hash = log.args.sellerId
+    const args = log.args
 
-    if (pub && hash) {
-      let [domain, id, rel] = await instance.sellers.call(pub, hash)
-
-    if (rel.toNumber() === 1) {
-      rel = 'reseller'
-    } else {
-      rel = 'direct'
-    }
-
-      logs.innerHTML += `<li>${name} ${pub} ${domain} ${id} ${rel}</li>`
-    }
-
-
+    logs.innerHTML += `<li>${name} ${JSON.stringify(args)}</li>`
   })
 }
 
-const addr = '0x3b69D38EE4040d118F30F8ad21660FC0CA3769cC'
-const domain = 'nytimes.com'
-const name = 'New York Times'
+async function init () {
+  const contract = tc(source)
+  contract.setProvider(getProvider())
+  instance = await contract.deployed()
+  account = getAccount()
+}
 
-setTimeout(async () => {
-  await main()
+async function onLoad () {
+  await init()
 
   if (getAccount()) {
-    //addPublisher(addr, domain, name)
-    getPublisherData()
     setUpEvents()
+    getPublisherData()
   } else {
     publisherInfo.innerHTML = `Please install MetaMask to update your list of sellers`
   }
-}, 1e3)
+}
+
+// wait for MetaMask to inject script
+window.addEventListener('load', onLoad)
+
+addSellerForm.addEventListener('submit', onAddSellerSubmit, false)
+removeSellerForm.addEventListener('submit', onRemoveSellerSubmit, false)
+getSellerForm.addEventListener('submit', onGetSellerSubmit, false)

@@ -4,92 +4,83 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="initial-scale=1, maximum-scale=1, user-scalable=yes">
   <title>DLS - Distributed List of Sellers</title>
+  <link rel="stylesheet" href="/css/style.css">
   <style>
-    .Account {
-      border: 1px solid black;
-      padding: 5px;
-    }
-    input[type="text"] {
-      width: 500px;
-    }
-    label {
-      display: block;
-    }
   </style>
 </head>
 <body>
-  <h1>Distributed List of Sellers</h1>
-  <h3>Ads.txt on the blockchain</h3>
-
-  <div class="Account">
-    <br />
-    <br />
-    <label>Connected publisher account via MetaMask:</label>
-    <div class="PublisherInfo">-</div>
-    <br />
-    <br />
-
-    <form class="AddSellerForm">
-      <div>
-        <label>Add Seller</label>
-        <input type="text" name="seller" placeholder="google.com, pub-123, RESELLER, 123" />
+  <div class="SiteContainer">
+    <div class="SiteHeaderContainer">
+      <div class="SiteHeader">
+        <h1>Distributed List of Sellers</h1>
+        <div class="Tagline">it's ads.txt, on the blockchain</div>
       </div>
-      <div>
-        <button type="submit">Add Seller</button>
-      </div>
-    </form>
-    <br />
-    <br />
-
-    <form class="RemoveSellerForm">
-      <div>
-        <label>Remove Seller</label>
-        <input type="text" name="seller" placeholder="google.com, pub-123" />
-      </div>
-      <div>
-        <button type="submit">Remove Seller</button>
-      </div>
-    </form>
-  </div>
-
-    <br />
-    <br />
-  <form class="GetSellerForm">
-    <div>
-      <label>Get Seller / check if pub has seller / check if pub in registry</label>
-      <div>
-      <input type="text" name="publisherDomain" placeholder="pub domain" />
-      </div>
-      <div>
-      <input type="text" name="sellerDomain" placeholder="seller domain" />
-      </div>
-      <div>
-      <input type="text" name="sellerId" placeholder="seller id" />
+      <div class="SiteHeaderInfo">
+        <a rel="noopener noreferrer" target="_blank" href="https://github.com/AdChain/DLS">Smart Contracts</a> |
+        <a rel="noopener noreferrer" target="_blank" href="https://github.com/AdChain/DLS">API Docs</a>
       </div>
     </div>
-    <div>
-      <button type="submit">Get Seller</button>
-    </div>
-  </form>
 
-  <br />
-  <br />
-  <div class="SellerInfo"></div>
-  <br />
-  <br />
-  <div>
-    Events
-    <ul id="logs">
-    </ul>
+    <div class="Forms">
+      <div class="Account">
+        <div class="ConnectedAccount">
+          <label>Connected publisher account via MetaMask:</label>
+          <div class="PublisherInfo">-</div>
+        </div>
+
+        <form class="AddSellerForm">
+          <div>
+            <label>Add Seller</label>
+            <input type="text" name="seller" placeholder="google.com, pub-123, RESELLER, 123" />
+          </div>
+          <div>
+            <button type="submit">Add Seller</button>
+          </div>
+        </form>
+
+        <form class="RemoveSellerForm">
+          <div>
+            <label>Remove Seller</label>
+            <input type="text" name="seller" placeholder="google.com, pub-123, reseller" />
+          </div>
+          <div>
+            <button type="submit">Remove Seller</button>
+          </div>
+        </form>
+      </div>
+
+      <div class="Seller">
+        <div class="SellerFormTitle">Check if publisher domain has seller<br /> or if publisher domain is in registry</div>
+        <form class="GetSellerForm">
+          <div>
+            <label>Publisher domain</label>
+            <input type="text" name="publisherDomain" placeholder="nytimes.com" />
+          </div>
+          <div>
+            <label>Seller domain</label>
+            <input type="text" name="sellerDomain" placeholder="google.com" />
+          </div>
+          <div>
+            <label>Seller ID</label>
+            <input type="text" name="sellerId" placeholder="pub-123" />
+          </div>
+          <div>
+            <label>Seller Relationship (reseller or direct)</label>
+            <input type="text" name="sellerRel" placeholder="reseller" />
+          </div>
+          <div>
+            <button type="submit">Submit</button>
+          </div>
+        </form>
+        <div class="SellerInfo"></div>
+      </div>
+    </div>
+
+    <div class="Events">
+      <div>Events</div>
+      <ul id="logs"></ul>
+    </div>
   </div>
-  <br />
-  <br />
-  REST API
-  <br />
-  <code>curl "https://dls-api.adchain.com/seller?domain={domain}&seller_domain={seller_domain}&seller_id={seller_id}"</code>
-  <br />
-  <br />
-  <br />
 
   <script src="/vendor/web3.min.js"></script>
   <script src="/dist/bundle.js"></script>
