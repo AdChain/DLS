@@ -33,7 +33,7 @@ async function getPublisherData () {
     domain = hex2ascii(domain)
 
     if (!domain) {
-      publisherInfo.innerHTML = `This account is not tied to a domain. Learn how to set up <a href="/register">here</a>.`
+      publisherInfo.innerHTML = `This account is not tied to a domain. Learn how to set up <a href="#register">here</a>.`
       return false
     }
 
@@ -41,8 +41,10 @@ async function getPublisherData () {
 
     publisherInfo.innerHTML = ''
     publisherInfo.appendChild(dom)
+    return true
   } catch (error) {
     alert(error)
+    return false
   }
 }
 
@@ -77,9 +79,10 @@ async function getSeller (pubDomain, sellerDomain, sellerId, sellerRel) {
     }
 
     if (sdomain) {
+      // TODO: not use innerHTML
       sellerInfo.innerHTML = `<div>is a seller</div><div>${sdomain}</div><div>${sid}</div><div>${srel}</div><div>${tagId}</div>`
     } else {
-      sellerInfo.innerHTML = `<div>not a seller</div>`
+      sellerInfo.textContent = `not a seller`
     }
   } catch (error) {
     alert(error)
@@ -103,7 +106,7 @@ function getAccount () {
   }
 }
 
-function onAddSellerSubmit (event) {
+async function onAddSellerSubmit (event) {
   event.preventDefault()
   const {target} = event
 
@@ -120,10 +123,16 @@ function onAddSellerSubmit (event) {
     rel = 2
   }
 
-  addSeller(domain, id, rel, tagId)
+  try {
+    target.classList.toggle('loading', true)
+    await addSeller(domain, id, rel, tagId)
+  } catch (error) {
+
+  }
+  target.classList.toggle('loading', false)
 }
 
-function onRemoveSellerSubmit (event) {
+async function onRemoveSellerSubmit (event) {
   event.preventDefault()
   const {target} = event
 
@@ -139,7 +148,14 @@ function onRemoveSellerSubmit (event) {
     sellerRel = 2
   }
 
-  removeSeller(sellerDomain, sellerId, sellerRel)
+  try {
+    target.classList.toggle('loading', true)
+    await removeSeller(sellerDomain, sellerId, sellerRel)
+  } catch (error) {
+
+  }
+
+  target.classList.toggle('loading', false)
 }
 
 async function onGetSellerSubmit (event) {
@@ -162,13 +178,13 @@ async function onGetSellerSubmit (event) {
   if (registered) {
     getSeller(pubDomain, sellerDomain, sellerId, sellerRel)
   } else {
-    sellerInfo.innerHTML = `<div>publisher is not in DLS</div>`
+    sellerInfo.textContent = `publisher is not in DLS`
   }
 }
 
 function setUpEvents () {
   instance.allEvents()
-  .watch(async (error, log) => {
+  .watch((error, log) => {
     if (error) {
       console.error(error)
       return false
@@ -178,6 +194,7 @@ function setUpEvents () {
     const name = log.event
     const args = log.args
 
+    // TODO: not use innerHTML
     logs.innerHTML += `<li>${name} ${JSON.stringify(args)}</li>`
   })
 }
@@ -193,10 +210,17 @@ async function onLoad () {
   await init()
 
   if (getAccount()) {
+    const isConnected = await getPublisherData()
+
+    if (isConnected) {
+      removeSellerForm.classList.toggle('disabled', false)
+      addSellerForm.classList.toggle('disabled', false)
+    }
+
     setUpEvents()
-    getPublisherData()
   } else {
-    publisherInfo.innerHTML = `Please install MetaMask to update your list of sellers`
+    // TODO: not use innerHTML
+    publisherInfo.innerHTML = `Please install or unlock MetaMask to update your list of sellers`
   }
 }
 
@@ -206,3 +230,32 @@ window.addEventListener('load', onLoad)
 addSellerForm.addEventListener('submit', onAddSellerSubmit, false)
 removeSellerForm.addEventListener('submit', onRemoveSellerSubmit, false)
 getSellerForm.addEventListener('submit', onGetSellerSubmit, false)
+
+
+/**
+ * Register form
+ */
+const registerForm = document.querySelector('#RegisterForm')
+registerForm.addEventListener('submit', onRegisterSubmit, false)
+
+async function onRegisterSubmit (event) {
+  event.preventDefault()
+  const target = event.target
+  const domain = target.domain.value
+  target.classList.toggle('loading', true)
+
+  const url = `https://dls-api.adchain.com/register?domain=${domain}`
+  window.fetch(url)
+  .then(function(response) {
+    return response.json()
+  })
+  .then(function(json) {
+    alert(JSON.stringify(json))
+  })
+  .catch(function(error) {
+   alert(error)
+  })
+  .then(function() {
+    target.classList.toggle('loading', false)
+  })
+}

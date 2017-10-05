@@ -2,11 +2,19 @@
 
 > [ads.txt](https://iabtechlab.com/ads-txt/) - on the blockchain.
 
+# Site
+
+[https://dls.adchain.com](https://dls.adchain.com)
+
+# Address
+
 Rinkeby Address
 
 https://rinkeby.etherscan.io/address/0x7f4d7db212f7f3d11f7cbc54ab36a17bbb196e3a
 
 # Documentation
+
+Smart contract documentation
 
 [https://dls.adchain.com/docs/DLS](https://dls.adchain.com/docs/DLS)
 

@@ -16,8 +16,9 @@
         <div class="Tagline">it's ads.txt, on the blockchain</div>
       </div>
       <div class="SiteHeaderInfo">
+        <a href="#register">Register domain</a> |
         <a rel="noopener noreferrer" target="_blank" href="https://github.com/AdChain/DLS">Smart Contracts</a> |
-        <a rel="noopener noreferrer" target="_blank" href="https://github.com/AdChain/DLS">API Docs</a>
+        <a rel="noopener noreferrer" target="_blank" href="https://github.com/AdChain/DLS-Server">API Docs</a>
       </div>
     </div>
 
@@ -28,7 +29,7 @@
           <div class="PublisherInfo">-</div>
         </div>
 
-        <form class="AddSellerForm">
+        <form class="AddSellerForm disabled">
           <div>
             <label>Add Seller</label>
             <input type="text" name="seller" placeholder="google.com, pub-123, RESELLER, 123" />
@@ -38,7 +39,7 @@
           </div>
         </form>
 
-        <form class="RemoveSellerForm">
+        <form class="RemoveSellerForm disabled">
           <div>
             <label>Remove Seller</label>
             <input type="text" name="seller" placeholder="google.com, pub-123, reseller" />
@@ -74,6 +75,33 @@
         </form>
         <div class="SellerInfo"></div>
       </div>
+    </div>
+
+    <div class="Register" id="register">
+      <h3>Register domain on DLS to be able to add/remove sellers</h3>
+      <p>Make sure to have the DNS TXT record:
+      <code>dlspubkey</code>, with your ethereum public key as the value.</p>
+
+      <div>Example</div>
+      <pre>
+      dlspubkey.example.com = "0x123...abc"
+      </pre>
+
+      <p>Only the private key pair of the public key will be able to sign transactions to update list of sellers for the domain.</p>
+
+      <div>
+        <p>Once you've done that, enter your domain and submit.<p>
+      </div>
+
+      <form id="RegisterForm">
+        <div>
+          <label>Publisher domain</label>
+          <input type="text" name="domain" placeholder="example.com">
+        </div>
+        <div>
+          <button type="submit">register</button>
+        </div>
+      </form>
     </div>
 
     <div class="Events">
