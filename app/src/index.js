@@ -57,6 +57,16 @@ async function addSeller (sellerDomain, sellerId, sellerRel, tagId) {
   }
 }
 
+async function addSellerHash (sellerDomain, sellerId, sellerRel) {
+  try {
+    const hash = `0x${soliditySHA3(['string', 'string', 'uint8'], [sellerDomain, sellerId, sellerRel]).toString('hex')}`
+    await instance.addSellerHash(hash, {from: account})
+    alert('added seller (hash only)')
+  } catch (error) {
+    alert(error)
+  }
+}
+
 async function removeSeller (sellerDomain, sellerId, sellerRel) {
   try {
     await instance.removeSeller(sellerDomain, sellerId, sellerRel, {from: account})
@@ -70,19 +80,23 @@ async function getSeller (pubDomain, sellerDomain, sellerId, sellerRel) {
   try {
     const sellerHash = `0x${soliditySHA3(['string', 'string', 'uint8'], [sellerDomain, sellerId, sellerRel]).toString('hex')}`
     const domainHash = `0x${soliditySHA3(['bytes32'], [pubDomain]).toString('hex')}`
-    let [sdomain, sid, srel, tagId] = await instance.sellers.call(domainHash, sellerHash)
+    let [sdomain, sid, srel, tagId, hash] = await instance.sellers.call(domainHash, sellerHash)
 
-    if (srel.toNumber() === 1) {
+    srel = srel.toNumber()
+
+    if (srel === 1) {
       srel = 'direct'
-    } else {
+    } else if (srel === 2) {
       srel = 'reseller'
+    } else {
+      srel = ''
     }
 
-    if (sdomain) {
+    if (parseInt(hash, 16) !== 0) {
       // TODO: not use innerHTML
-      sellerInfo.innerHTML = `<div>is a seller</div><div>${sdomain}</div><div>${sid}</div><div>${srel}</div><div>${tagId}</div>`
+      sellerInfo.innerHTML = `<div class="green">IS A SELLER</div><div>Seller hash: ${hash}</div><div>Seller domain: ${sellerDomain}</div><div>Seller ID: ${sellerId}</div><div>Seller Relationship: ${sellerRel}</div><div>Seller TAG ID: ${tagId}</div>`
     } else {
-      sellerInfo.textContent = `not a seller`
+      sellerInfo.innerHTML = `<div class="red">NOT A SELLER</div>`
     }
   } catch (error) {
     alert(error)
@@ -116,6 +130,7 @@ async function onAddSellerSubmit (event) {
   id = (id && id.trim()) || ''
   rel = (rel && rel.trim().toLowerCase()) || ''
   tagId = (tagId && tagId.trim()) || ''
+  const hashOnly = target.hash.checked
 
   if (rel === 'direct') {
     rel = 1
@@ -125,7 +140,11 @@ async function onAddSellerSubmit (event) {
 
   try {
     target.classList.toggle('loading', true)
-    await addSeller(domain, id, rel, tagId)
+    if (hashOnly) {
+      await addSellerHash(domain, id, rel, tagId)
+    } else {
+      await addSeller(domain, id, rel, tagId)
+    }
   } catch (error) {
 
   }
@@ -178,7 +197,8 @@ async function onGetSellerSubmit (event) {
   if (registered) {
     getSeller(pubDomain, sellerDomain, sellerId, sellerRel)
   } else {
-    sellerInfo.textContent = `publisher is not in DLS`
+    // TODO: not use innerHTML
+    sellerInfo.innerHTML = `<div class="red">Publisher domain is not in DLS</div>`
   }
 }
 
