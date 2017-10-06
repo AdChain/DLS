@@ -125,26 +125,6 @@ contract DLS {
   }
 
   /**
-   * @notice Check if publisher is registered.
-   * @param pubKey pubisher public key
-   * @return bool
-   */
-  function isRegisteredPublisher(address pubKey) external constant returns (bool) {
-    if (domains[pubKey] != "") return true;
-    return false;
-  }
-
-  /**
-   * @notice Check if publisher is registered by domain
-   * @param domain pubisher domain
-   * @return bool
-   */
-  function isRegisteredPublisherDomain(bytes32 domain) external constant returns (bool) {
-    if (publishers[sha3(domain)] != address(0)) return true;
-    return false;
-  }
-
-  /**
    * @notice add seller for publisher.
    * Only allowed once publisher is registered.
    * @param sellerDomain domain of seller/exchange
@@ -201,6 +181,26 @@ contract DLS {
     string publisherDomain
   ) public constant returns (address) {
     return publishers[sha3(publisherDomain)];
+  }
+
+  /**
+   * @notice Check if publisher is registered.
+   * @param pubKey pubisher public key
+   * @return bool
+   */
+  function isRegisteredPublisher(address pubKey) external constant returns (bool) {
+    if (domains[pubKey] != "") return true;
+    return false;
+  }
+
+  /**
+   * @notice Check if publisher is registered by domain
+   * @param domain pubisher domain
+   * @return bool
+   */
+  function isRegisteredPublisherDomain(bytes32 domain) external constant returns (bool) {
+    if (publishers[sha3(domain)] != address(0)) return true;
+    return false;
   }
 
   /**
