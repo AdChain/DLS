@@ -1,6 +1,12 @@
 <!DOCTYPE html>
 <html lang="en-US">
 <head>
+  <script>
+  var url = window.location.href.replace(/http:\/\/dls.adchain.com/gi, 'https://dls.adchain.com');
+  if (url !== window.location.href) {
+    window.location.href = url;
+  }
+  </script>
   <meta charset="UTF-8">
   <meta name="viewport" content="initial-scale=1, maximum-scale=1, user-scalable=yes">
   <title>DLS - Distributed List of Sellers</title>
