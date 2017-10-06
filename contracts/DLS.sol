@@ -62,10 +62,10 @@ contract DLS {
    * Events, when triggered, record logs in the blockchain.
    * Clients can listen on specific events to fetch data.
    */
-  event _PublisherRegistered(bytes32 domain, address indexed id);
-  event _PublisherDeregistered(bytes32 domain, address indexed id);
-  event _SellerAdded(address indexed publisher, bytes32 indexed sellerHash);
-  event _SellerRemoved(address indexed publisher, bytes32 indexed sellerHash);
+  event _PublisherRegistered(bytes32 indexed publisherDomain, address indexed publisherKey);
+  event _PublisherDeregistered(bytes32 indexed publisherDomain, address indexed publisherKey);
+  event _SellerAdded(bytes32 indexed publisherDomain, bytes32 indexed sellerHash);
+  event _SellerRemoved(bytes32 indexed publisherDomain, bytes32 indexed sellerHash);
 
   /**
    * @notice modifier which limits execution
@@ -161,7 +161,7 @@ contract DLS {
     require(sha3(domains[msg.sender]) != sha3(""));
     bytes32 hash = sha3(sellerDomain, sellerId, sellerRel);
     sellers[sha3(domains[msg.sender])][hash] = Seller(sellerDomain, sellerId, Relationship(sellerRel), sellerTagId, hash);
-    _SellerAdded(msg.sender, hash);
+    _SellerAdded(domains[msg.sender], hash);
   }
 
   /**
@@ -171,7 +171,7 @@ contract DLS {
   function addSellerHash(bytes32 hash) external {
     require(sha3(domains[msg.sender]) != sha3(""));
     sellers[sha3(domains[msg.sender])][hash] = Seller("", "", Relationship.Null, "", hash);
-    _SellerAdded(msg.sender, hash);
+    _SellerAdded(domains[msg.sender], hash);
   }
 
   /**
@@ -189,7 +189,7 @@ contract DLS {
     require(sha3(domains[msg.sender]) != sha3(""));
     bytes32 hash = sha3(sellerDomain, sellerId, sellerRel);
     delete sellers[sha3(domains[msg.sender])][hash];
-    _SellerRemoved(msg.sender, hash);
+    _SellerRemoved(domains[msg.sender], hash);
   }
 
   /**

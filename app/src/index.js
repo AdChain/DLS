@@ -203,7 +203,7 @@ async function onGetSellerSubmit (event) {
 }
 
 function setUpEvents () {
-  instance.allEvents()
+  instance.allEvents({fromBlock: 0, toBlock: 'latest'})
   .watch((error, log) => {
     if (error) {
       console.error(error)
@@ -213,6 +213,10 @@ function setUpEvents () {
 
     const name = log.event
     const args = log.args
+
+    if (args && args.publisherDomain) {
+      args.publisherDomain = hex2ascii(args.publisherDomain)
+    }
 
     // TODO: not use innerHTML
     logs.innerHTML += `<li>${name} ${JSON.stringify(args)}</li>`
