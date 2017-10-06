@@ -17,6 +17,20 @@ const removeSellerForm = document.querySelector('.RemoveSellerForm')
 const getSellerForm = document.querySelector('.GetSellerForm')
 const logs = document.querySelector('#logs')
 
+let sellerList = require('./sellerList.json')
+sellerList.unshift("")
+sellerList = sellerList.map(x => {
+   return {
+      label: x,
+      value: x
+   }
+})
+
+const choices = new window.Choices('.AddPubliserSellerDomain', {
+  choices: sellerList,
+   editItems: true,
+})
+
 async function isRegisteredPublisher (domain) {
   try {
     const isRegistered = await instance.isRegisteredPublisherDomain(domain, {from: account})
@@ -124,26 +138,39 @@ async function onAddSellerSubmit (event) {
   event.preventDefault()
   const {target} = event
 
-  let [domain, id, rel, tagId] = target.seller.value.split(',')
+  const sellerDomainChoice = choices.getValue().value.toLowerCase().trim()
+  const sellerDomainInput = target.sellerDomain.value.toLowerCase().trim()
 
-  domain = domain.trim().toLowerCase()
-  id = (id && id.trim()) || ''
-  rel = (rel && rel.trim().toLowerCase()) || ''
-  tagId = (tagId && tagId.trim()) || ''
+  if (!(sellerDomainChoice || sellerDomainInput)) {
+    alert('please select a seller')
+    return false
+  }
+
+  const sellerId = target.sellerId.value.toLowerCase().trim()
+  const sellerRel = parseInt(target.sellerRel.value, 10) || 0
+  //tagId = (tagId && tagId.trim()) || ''
   const hashOnly = target.hash.checked
 
-  if (rel === 'direct') {
-    rel = 1
-  } else {
-    rel = 2
+  let sellerDomain = sellerDomainChoice
+
+  if (sellerDomainInput) {
+    sellerDomain = sellerDomainInput
+    choices.setValueByChoice('')
+  } else if (sellerDomainChoice) {
+    sellerDomainInput.value = ''
+  }
+
+  if (!sellerId) {
+    alert('Please enter a seller ID')
+    return false
   }
 
   try {
     target.classList.toggle('loading', true)
     if (hashOnly) {
-      await addSellerHash(domain, id, rel, tagId)
+      await addSellerHash(sellerDomain, sellerId, sellerRel, tagId)
     } else {
-      await addSeller(domain, id, rel, tagId)
+      await addSeller(sellerDomain, sellerId, sellerRel, tagId)
     }
   } catch (error) {
 
@@ -184,13 +211,7 @@ async function onGetSellerSubmit (event) {
   const pubDomain = target.publisherDomain.value.trim()
   const sellerDomain = target.sellerDomain.value.trim()
   const sellerId = target.sellerId.value.trim()
-  let sellerRel = target.sellerRel.value.toLowerCase().trim()
-
-  if (sellerRel === 'direct') {
-    sellerRel = 1
-  } else {
-    sellerRel = 2
-  }
+  const sellerRel = parseInt(target.sellerRel.value, 10) || 0
 
   const registered = await isRegisteredPublisher(pubDomain)
 

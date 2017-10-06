@@ -4,10 +4,9 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="initial-scale=1, maximum-scale=1, user-scalable=yes">
   <title>DLS - Distributed List of Sellers</title>
+  <link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/choices.js/3.0.2/styles/css/choices.min.css">
   <link rel="stylesheet" href="/css/style.css">
-  <style>
-  </style>
-</head>
+  </head>
 <body>
   <div class="SiteContainer">
     <div class="SiteHeaderContainer">
@@ -31,8 +30,25 @@
 
         <form class="AddSellerForm disabled">
           <div>
-            <label>Add Seller</label>
-            <input type="text" name="seller" placeholder="google.com, pub-123, RESELLER, 123" />
+            <label>Select Seller Domain to add</label>
+            <select class="AddPubliserSellerDomain"></select>
+            <label>Or enter custom seller top level domain (no subdomains)</label>
+            <input type="text" name="sellerDomain" placeholder="google.com" />
+          </div>
+          <div>
+            <label>Seller ID</label>
+            <input type="text" name="sellerId" placeholder="pub-123" />
+          </div>
+          <div>
+            <label>Seller Relationship</label>
+            <label>
+              <input type="radio" name="sellerRel" value="1" checked/>
+              Direct
+            </label>
+            <label>
+              <input type="radio" name="sellerRel" value="2" />
+              Reseller
+            </label>
           </div>
           <div>
             <label>
@@ -72,8 +88,15 @@
             <input type="text" name="sellerId" placeholder="pub-123" />
           </div>
           <div>
-            <label>Seller Relationship (reseller or direct)</label>
-            <input type="text" name="sellerRel" placeholder="reseller" />
+            <label>Seller Relationship</label>
+            <label>
+              <input type="radio" name="sellerRel" value="1" checked/>
+              Direct
+            </label>
+            <label>
+              <input type="radio" name="sellerRel" value="2" />
+              Reseller
+            </label>
           </div>
           <div>
             <button type="submit">Submit</button>
@@ -116,6 +139,21 @@
     </div>
   </div>
 
+  <script src="//cdnjs.cloudflare.com/ajax/libs/choices.js/3.0.2/choices.min.js"></script>
+  <style>
+    .choices {
+      margin-bottom: 0;
+    }
+    .choices__list--single .choices__item {
+      margin-bottom: 0;
+    }
+    .choices[data-type*=select-one]:after {
+      margin-top: -7.5px;
+    }
+    .choices[data-type*=select-one].is-open:after {
+      margin-top: -9.5px;
+    }
+  </style>
   <script src="/vendor/web3.min.js"></script>
   <script src="/dist/bundle.js"></script>
 </body>
