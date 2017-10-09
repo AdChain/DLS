@@ -44,6 +44,6 @@
     "h": "^0.1.0",
     "hex2ascii": "0.0.2",
     "promise-wait": "^1.0.0",
-    "web3-detect-network": "0.0.3"
+    "web3-detect-network": "0.0.4"
   }
 }
