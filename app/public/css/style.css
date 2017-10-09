@@ -51,6 +51,10 @@ input[type="text"] {
   font-style: italic;
 }
 
+.NetworkInfo {
+  margin-top: 0.4em;
+}
+
 .Account {
   padding: 0.5em;
   border: 1px solid #e4e4e4;
