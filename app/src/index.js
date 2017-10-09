@@ -3,12 +3,15 @@
 const tc = require('truffle-contract')
 const { soliditySHA3 } = require('ethereumjs-abi')
 const hex2ascii = require('hex2ascii')
+const detectNetwork = require('web3-detect-network')
 const h = require('h')
 
 const source = require('../../build/contracts/DLS.json')
 
+let contract = null
 let instance = null
 let account = null
+let provider = null
 
 const publisherInfo = document.querySelector('.PublisherInfo')
 const sellerInfo = document.querySelector('.SellerInfo')
@@ -245,27 +248,39 @@ function setUpEvents () {
 }
 
 async function init () {
-  const contract = tc(source)
-  contract.setProvider(getProvider())
+  contract = tc(source)
+
+  provider = getProvider()
+  contract.setProvider(provider)
+
+  const {id:netId, type:netType} = await detectNetwork(provider)
+  if (netType !== 'rinkeby') {
+    alert('Please connect to the Rinkeby testnet')
+  }
+
   instance = await contract.deployed()
   account = getAccount()
 }
 
 async function onLoad () {
-  await init()
+  try {
+    await init()
 
-  if (getAccount()) {
-    const isConnected = await getPublisherData()
+    if (getAccount()) {
+      const isConnected = await getPublisherData()
 
-    if (isConnected) {
-      removeSellerForm.classList.toggle('disabled', false)
-      addSellerForm.classList.toggle('disabled', false)
+      if (isConnected) {
+        removeSellerForm.classList.toggle('disabled', false)
+        addSellerForm.classList.toggle('disabled', false)
+      }
+
+      setUpEvents()
+    } else {
+      // TODO: not use innerHTML
+      publisherInfo.innerHTML = `Please install or unlock MetaMask to update your list of sellers`
     }
-
-    setUpEvents()
-  } else {
-    // TODO: not use innerHTML
-    publisherInfo.innerHTML = `Please install or unlock MetaMask to update your list of sellers`
+  } catch (error) {
+    alert(error.message)
   }
 }
 

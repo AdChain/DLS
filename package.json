@@ -42,6 +42,7 @@
   "dependencies": {
     "ethereumjs-abi": "^0.6.4",
     "h": "^0.1.0",
-    "hex2ascii": "0.0.2"
+    "hex2ascii": "0.0.2",
+    "web3-detect-network": "0.0.3"
   }
 }
