@@ -5,6 +5,7 @@ const { soliditySHA3 } = require('ethereumjs-abi')
 const hex2ascii = require('hex2ascii')
 const detectNetwork = require('web3-detect-network')
 const h = require('h')
+const wait = require('promise-wait')
 
 const source = require('../../build/contracts/DLS.json')
 
@@ -250,6 +251,8 @@ function setUpEvents () {
 async function init () {
   contract = tc(source)
 
+  // wait for web3 to load
+  await wait(1000)
   provider = getProvider()
   contract.setProvider(provider)
 
