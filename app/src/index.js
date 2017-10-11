@@ -112,7 +112,7 @@ async function getSeller (pubDomain, sellerDomain, sellerId, sellerRel) {
 
     if (parseInt(hash, 16) !== 0) {
       // TODO: not use innerHTML
-      sellerInfo.innerHTML = `<div class="green">IS A SELLER</div><div>Seller hash: ${hash}</div><div>Seller domain: ${sellerDomain}</div><div>Seller ID: ${sellerId}</div><div>Seller Relationship: ${sellerRel}</div><div>Seller TAG ID: ${tagId}</div>`
+      sellerInfo.innerHTML = `<div class="green">IS A SELLER</div><div>Seller hash: ${hash}</div><div>Seller domain: ${sellerDomain}</div><div>Seller ID: ${sellerId}</div><div>Seller Relationship: ${sellerRel}</div>`
     } else {
       sellerInfo.innerHTML = `<div class="red">NOT A SELLER</div>`
     }
@@ -153,6 +153,7 @@ async function onAddSellerSubmit (event) {
   const sellerId = target.sellerId.value.toLowerCase().trim()
   const sellerRel = parseInt(target.sellerRel.value, 10) || 0
   //tagId = (tagId && tagId.trim()) || ''
+  const tagId = ""
   const hashOnly = target.hash.checked
 
   let sellerDomain = sellerDomainChoice
@@ -177,8 +178,9 @@ async function onAddSellerSubmit (event) {
       await addSeller(sellerDomain, sellerId, sellerRel, tagId)
     }
   } catch (error) {
-
+    console.error(error)
   }
+
   target.classList.toggle('loading', false)
 }
 
