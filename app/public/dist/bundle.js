@@ -70,7 +70,7 @@ async function getPublisherData() {
 async function addSeller(sellerDomain, sellerId, sellerRel) {
   try {
     const hash = `0x${soliditySHA3(['string', 'string', 'uint8'], [sellerDomain, sellerId, sellerRel]).toString('hex')}`;
-    await instance.addSellerHash(hash, { from: account });
+    await instance.addSeller(hash, { from: account });
     alert('added seller (hash only)');
   } catch (error) {
     alert(error);
@@ -147,7 +147,6 @@ async function onAddSellerSubmit(event) {
   const sellerRel = parseInt(target.sellerRel.value, 10) || 0;
   //tagId = (tagId && tagId.trim()) || ''
   const tagId = "";
-  const hashOnly = target.hash.checked;
 
   let sellerDomain = sellerDomainChoice;
 
