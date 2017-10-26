@@ -13,7 +13,8 @@
     "deploy:rinkeby": "truffle migrate --reset --network=rinkeby",
     "watch:app": "watchify -t [babelify] app/src/index.js -o app/public/dist/bundle.js",
     "build:app": "browserify -t [babelify] app/src/index.js -o app/public/dist/bundle.js",
-    "docs": "doxity build"
+    "docs": "doxity build",
+    "lint": "solium --file contracts/DLS.sol"
   },
   "repository": {
     "type": "git",

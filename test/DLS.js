@@ -83,34 +83,26 @@ contract('DLS', function (accounts) {
     assert.equal(isDomainRegistered3, true)
   })
 
-  it('should add seller to publisher sellers', async () => {
+  it('should not be able to add seller if not registered as publisher', async () => {
     const instance = await DLS.deployed()
 
-    const publisher = accounts[1]
-    const sellerId = accounts[2]
+    const publisher = accounts[6]
     const pubDomain = 'example.com'
-    const sellerDomain = 'google.com'
-    const rel = Relationship.Reseller
-    const tagId = ''
+    const sellerDomain = 'openx.com'
+    const sellerId = '1234'
+    const rel = Relationship.Direct
 
-    const isSeller = await instance.isSellerForPublisher.call(publisher, sellerDomain, sellerId, rel)
-    assert.equal(isSeller, false)
+    const hash = `0x${soliditySHA3(['string', 'string', 'uint8'], [sellerDomain, sellerId, rel]).toString('hex')}`
 
-    await instance.addSeller(sellerDomain, sellerId, rel, tagId, {from: publisher})
+    let _err = null
 
-    const eventObj = await getLastEvent(instance)
-    assert.equal(eventObj.event, '_SellerAdded')
+    try {
+      await instance.addSeller(hash, {from: publisher})
+    } catch (error) {
+      _err = error
+    }
 
-    const sellerHash = `0x${soliditySHA3(['string', 'string', 'uint8'], [sellerDomain, sellerId, rel]).toString('hex')}`
-    const domainHash = `0x${soliditySHA3(['bytes32'], [pubDomain]).toString('hex')}`
-    const [sellerDomain2, sellerId2, rel2] = await instance.sellers.call(domainHash, sellerHash)
-
-    assert.equal(sellerId2, sellerId)
-    assert.equal(sellerDomain2, sellerDomain)
-    assert.equal(rel2, rel)
-
-    const isSeller2 = await instance.isSellerForPublisher.call(publisher, sellerDomain, sellerId, rel)
-    assert.equal(isSeller2, true)
+    assert.ok(_err !== null)
   })
 
   it('should add seller hash to publisher sellers', async () => {
@@ -121,23 +113,18 @@ contract('DLS', function (accounts) {
     const sellerDomain = 'openx.com'
     const sellerId = '1234'
     const rel = Relationship.Direct
-    const tagId = ''
 
     const hash = `0x${soliditySHA3(['string', 'string', 'uint8'], [sellerDomain, sellerId, rel]).toString('hex')}`
 
-    await instance.addSellerHash(hash, {from: publisher})
+    await instance.addSeller(hash, {from: publisher})
 
     const eventObj = await getLastEvent(instance)
     assert.equal(eventObj.event, '_SellerAdded')
 
     const sellerHash = `0x${soliditySHA3(['string', 'string', 'uint8'], [sellerDomain, sellerId, rel]).toString('hex')}`
     const domainHash = `0x${soliditySHA3(['bytes32'], [pubDomain]).toString('hex')}`
-    const [sellerDomain2, sellerId2, rel2, tagId2, sellerHash2] = await instance.sellers.call(domainHash, sellerHash)
+    const sellerHash2 = await instance.sellers.call(domainHash, sellerHash)
 
-    assert.equal(sellerId2, '')
-    assert.equal(sellerDomain2, '')
-    assert.equal(rel2.toNumber(), 0)
-    assert.equal(tagId2, '')
     assert.equal(sellerHash2, sellerHash)
   })
 
@@ -145,18 +132,20 @@ contract('DLS', function (accounts) {
     const instance = await DLS.deployed()
 
     const publisher = accounts[1]
-    const id = accounts[2]
-    const domain = 'example.com'
+    const sellerId = accounts[2]
+    const sellerDomain = 'example.com'
     const rel = Relationship.Reseller
 
-    await instance.removeSeller(domain, id, rel, {from: publisher})
+    const sellerHash = `0x${soliditySHA3(['string', 'string', 'uint8'], [sellerDomain, sellerId, rel]).toString('hex')}`
 
-    const isSeller = await instance.isSellerForPublisher.call(publisher, domain, id, rel)
+    await instance.removeSeller(sellerHash, {from: publisher})
+
+    const isSeller = await instance.isSellerForPublisher.call(publisher, sellerDomain, sellerId, rel)
     assert.equal(isSeller, false)
 
-    const [domain2, id2] = await instance.sellers.call(publisher, id)
+    const hash = await instance.sellers.call(publisher, sellerId)
 
-    assert.equal(id2, 0)
+    assert.equal(hash, 0)
   })
 
   it('should deregister publisher from registry', async () => {

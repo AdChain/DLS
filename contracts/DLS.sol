@@ -3,18 +3,6 @@ pragma solidity ^0.4.4;
 
 contract DLS {
   /*
-   * A container for publisher-reseller relationship data.
-   * This is the equivalent of a single row in ads.txt
-   */
-  struct Seller {
-    string domain; // SSP/Exchange Domain
-    string id; // SellerAccountID
-    Relationship rel; // PaymentsType
-    string tagId; // TAGID - Trustworthy Accountability Group ID
-    bytes32 hash; // hash of: (domain, id, rel)
-  }
-
-  /*
    * The various types of relationships
    * (can be extended along with ads.txt spec)
    */
@@ -42,16 +30,12 @@ contract DLS {
 
    /**
     * @notice a mapping of publsher domains to
-    * their authorized sellers and their data.
+    * their hashes of authorized sellers
     *
     * @example example
-    * sellers[sha3(domain)][sellerHash] -> Seller
-    *
-    * Publishers ads.txt
-    * Row 1 - reseller1.com, 1293sdf, direct, tagId, hash
-    * Row 2 - reseller2.com, 1293sdf, reseller, tagId, hash
+    * sellers[sha3(domain)][sellerHash] -> sellerHash
     */
-  mapping (bytes32 => mapping (bytes32 => Seller)) public sellers;
+  mapping (bytes32 => mapping (bytes32 => bytes32)) public sellers;
 
   /**
    * @notice The owner of this contract.
@@ -71,7 +55,7 @@ contract DLS {
    * @notice modifier which limits execution
    * of the function to the owner.
    */
-  modifier only_owner () {
+  modifier onlyOwner () {
     if (msg.sender != owner) {
       revert();
     }
@@ -92,8 +76,8 @@ contract DLS {
    * @notice Change owner of contract.
    * @param newOwner new owner address
    */
-  function changeOwner(address newOwner) only_owner external {
-    owner =  newOwner;
+  function changeOwner(address newOwner) onlyOwner external {
+    owner = newOwner;
   }
 
   /**
@@ -104,8 +88,8 @@ contract DLS {
    * @param domain pubisher domain
    * @param pubKey pubisher public key
    */
-  function registerPublisher(bytes32 domain, address pubKey) only_owner external {
-    require(domains[pubKey] == "");
+  function registerPublisher(bytes32 domain, address pubKey) onlyOwner external {
+    require(domains[pubKey] == 0);
     publishers[sha3(domain)] = pubKey;
     domains[pubKey] = domain;
     _PublisherRegistered(domain, pubKey);
@@ -116,7 +100,7 @@ contract DLS {
    * Only contract owner is allowed to deregister.
    * @param pubKey pubisher public key
    */
-  function deregisterPublisher(address pubKey) only_owner external {
+  function deregisterPublisher(address pubKey) onlyOwner external {
     require(publishers[sha3(domains[pubKey])] != address(0));
     // order matters here, delete pub from map first.
     delete publishers[sha3(domains[pubKey])];
@@ -125,49 +109,24 @@ contract DLS {
   }
 
   /**
-   * @notice add seller for publisher.
-   * Only allowed once publisher is registered.
-   * @param sellerDomain domain of seller/exchange
-   * @param sellerId ID of seller
-   * @param sellerRel Relationship of seller. (Direct: 0, Reseller: 1)
-   * @param sellerTagId Trustworthy Accountability Group (TAG) ID
-   */
-  function addSeller(
-    string sellerDomain,
-    string sellerId,
-    Relationship sellerRel,
-    string sellerTagId
-  ) external {
-    require(sha3(domains[msg.sender]) != sha3(""));
-    bytes32 hash = sha3(sellerDomain, sellerId, sellerRel);
-    sellers[sha3(domains[msg.sender])][hash] = Seller(sellerDomain, sellerId, Relationship(sellerRel), sellerTagId, hash);
-    _SellerAdded(domains[msg.sender], hash);
-  }
-
-  /**
-   * @notice Allow publisher to add a seller by hash (instead of plain text attributes)
+   * @notice Allow publisher to add a seller by the hash of the seller information.
    * @param hash sha3 hash of seller information
    */
-  function addSellerHash(bytes32 hash) external {
-    require(sha3(domains[msg.sender]) != sha3(""));
-    sellers[sha3(domains[msg.sender])][hash] = Seller("", "", Relationship.Null, "", hash);
+  function addSeller(bytes32 hash) external returns (bytes32) {
+    // Check that this ethereum address is a registered publisher.
+    require(domains[msg.sender] != 0);
+    sellers[sha3(domains[msg.sender])][hash] = hash;
     _SellerAdded(domains[msg.sender], hash);
+    return sha3(domains[msg.sender]);
   }
 
   /**
-   * @notice Remove seller from publisher.
-   * @param sellerDomain domain of seller
-   * @param sellerId ID of seller
-   * @param sellerRel Relationship of seller. (Direct: 0, Reseller: 1)
+   * @notice Remove seller from publisher
+   * @param hash sha3 hash of seller information
    */
-  function removeSeller(
-    string sellerDomain,
-    string sellerId,
-    Relationship sellerRel
-  ) external {
+  function removeSeller(bytes32 hash) external {
     // Check that this ethereum address is a registered publisher.
-    require(sha3(domains[msg.sender]) != sha3(""));
-    bytes32 hash = sha3(sellerDomain, sellerId, sellerRel);
+    require(domains[msg.sender] != 0);
     delete sellers[sha3(domains[msg.sender])][hash];
     _SellerRemoved(domains[msg.sender], hash);
   }
@@ -177,9 +136,7 @@ contract DLS {
     * @param publisherDomain domain of publisher
     * @return publisher public key
     */
-  function getPublisherFromDomain(
-    string publisherDomain
-  ) public constant returns (address) {
+  function getPublisherFromDomain(string publisherDomain) public constant returns (address) {
     return publishers[sha3(publisherDomain)];
   }
 
@@ -189,8 +146,7 @@ contract DLS {
    * @return bool
    */
   function isRegisteredPublisher(address pubKey) external constant returns (bool) {
-    if (domains[pubKey] != "") return true;
-    return false;
+    return (domains[pubKey] != "");
   }
 
   /**
@@ -199,8 +155,7 @@ contract DLS {
    * @return bool
    */
   function isRegisteredPublisherDomain(bytes32 domain) external constant returns (bool) {
-    if (publishers[sha3(domain)] != address(0)) return true;
-    return false;
+    return (publishers[sha3(domain)] != address(0));
   }
 
   /**
@@ -216,16 +171,11 @@ contract DLS {
     string sellerDomain,
     string sellerId,
     Relationship sellerRel
-  ) external constant returns (bool) {
+  )
+  external
+  constant
+  returns (bool) {
     bytes32 hash = sha3(sellerDomain, sellerId, sellerRel);
-    Seller storage seller = sellers[sha3(domains[pubKey])][hash];
-
-    if (sha3(seller.id) != sha3("")) {
-      if (seller.rel == sellerRel) {
-        return true;
-      }
-    }
-
-    return false;
+    return (sellers[sha3(domains[pubKey])][hash] != "");
   }
 }

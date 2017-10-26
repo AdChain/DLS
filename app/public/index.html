@@ -58,12 +58,6 @@
             </label>
           </div>
           <div>
-            <label>
-              <input type="checkbox" name="hash" />
-              make hash of seller info only thing public
-            </label>
-          </div>
-          <div>
             <button type="submit">Add Seller</button>
           </div>
         </form>
@@ -116,14 +110,14 @@
     <div class="Register" id="register">
       <h3>Register domain on DLS to be able to add/remove sellers</h3>
       <p>Make sure to have the DNS TXT record:
-      <code>dlsaddress</code>, with your ethereum public key as the value.</p>
+      <code>dlsaddress</code>, with your ethereum public address as the value.</p>
 
       <div>Example</div>
       <pre>
       dlsaddress.example.com = "0x123...abc"
       </pre>
 
-      <p>Only the private key pair of the public key will be able to sign transactions to update list of sellers for the domain.</p>
+      <p>Only the private key pair of the public address will be able to sign transactions to update list of sellers for the domain.</p>
 
       <div>
         <p>Once you've done that, enter your domain and submit.<p>

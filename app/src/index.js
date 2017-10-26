@@ -66,16 +66,7 @@ async function getPublisherData () {
   }
 }
 
-async function addSeller (sellerDomain, sellerId, sellerRel, tagId) {
-  try {
-    await instance.addSeller(sellerDomain, sellerId, sellerRel, tagId, {from: account})
-    alert('added seller')
-  } catch (error) {
-    alert(error)
-  }
-}
-
-async function addSellerHash (sellerDomain, sellerId, sellerRel) {
+async function addSeller (sellerDomain, sellerId, sellerRel) {
   try {
     const hash = `0x${soliditySHA3(['string', 'string', 'uint8'], [sellerDomain, sellerId, sellerRel]).toString('hex')}`
     await instance.addSellerHash(hash, {from: account})
@@ -87,7 +78,8 @@ async function addSellerHash (sellerDomain, sellerId, sellerRel) {
 
 async function removeSeller (sellerDomain, sellerId, sellerRel) {
   try {
-    await instance.removeSeller(sellerDomain, sellerId, sellerRel, {from: account})
+    const hash = `0x${soliditySHA3(['string', 'string', 'uint8'], [sellerDomain, sellerId, sellerRel]).toString('hex')}`
+    await instance.removeSeller(hash, {from: account})
     alert('removed seller')
   } catch (error) {
     alert(error)
@@ -98,9 +90,9 @@ async function getSeller (pubDomain, sellerDomain, sellerId, sellerRel) {
   try {
     const sellerHash = `0x${soliditySHA3(['string', 'string', 'uint8'], [sellerDomain, sellerId, sellerRel]).toString('hex')}`
     const domainHash = `0x${soliditySHA3(['bytes32'], [pubDomain]).toString('hex')}`
-    let [sdomain, sid, srel, tagId, hash] = await instance.sellers.call(domainHash, sellerHash)
+    let hash = await instance.sellers.call(domainHash, sellerHash)
 
-    srel = srel.toNumber()
+    var srel = sellerRel
 
     if (srel === 1) {
       srel = 'direct'
@@ -112,7 +104,7 @@ async function getSeller (pubDomain, sellerDomain, sellerId, sellerRel) {
 
     if (parseInt(hash, 16) !== 0) {
       // TODO: not use innerHTML
-      sellerInfo.innerHTML = `<div class="green">IS A SELLER</div><div>Seller hash: ${hash}</div><div>Seller domain: ${sellerDomain}</div><div>Seller ID: ${sellerId}</div><div>Seller Relationship: ${sellerRel}</div>`
+      sellerInfo.innerHTML = `<div class="green">IS A SELLER</div><div>Seller hash: ${hash}</div><div>Seller domain: ${sellerDomain}</div><div>Seller ID: ${sellerId}</div><div>Seller Relationship: ${srel}</div>`
     } else {
       sellerInfo.innerHTML = `<div class="red">NOT A SELLER</div>`
     }
@@ -172,11 +164,7 @@ async function onAddSellerSubmit (event) {
 
   try {
     target.classList.toggle('loading', true)
-    if (hashOnly) {
-      await addSellerHash(sellerDomain, sellerId, sellerRel, tagId)
-    } else {
-      await addSeller(sellerDomain, sellerId, sellerRel, tagId)
-    }
+    await addSeller(sellerDomain, sellerId, sellerRel)
   } catch (error) {
     console.error(error)
   }
