@@ -194,18 +194,6 @@ contract('DLS', function (accounts) {
     assert.equal(hash, 0)
   })
 
-  it('should be able to change owner if owner', async () => {
-    const instance = await DLS.deployed()
-
-    const owner = await instance.owner.call()
-    assert.equal(owner, accounts[0])
-
-    const newOwner = accounts[1]
-    await instance.changeOwner(newOwner)
-    const owner2 = await instance.owner.call()
-    assert.equal(owner2, newOwner)
-  })
-  /*
   it('should deregister publisher from registry', async () => {
     const instance = await DLS.deployed()
 
@@ -228,6 +216,18 @@ contract('DLS', function (accounts) {
     assert.equal(isDomainRegistered, false)
   })
 
+  it('should be able to change owner if owner', async () => {
+    const instance = await DLS.deployed()
+
+    const owner = await instance.owner.call()
+    assert.equal(owner, accounts[0])
+
+    const newOwner = accounts[1]
+    await instance.changeOwner(newOwner)
+    const owner2 = await instance.owner.call()
+    assert.equal(owner2, newOwner)
+  })
+
   it('should not be able to change owner if not owner', async () => {
     const instance = await DLS.deployed()
 
@@ -243,6 +243,4 @@ contract('DLS', function (accounts) {
       assert.notEqual(error, undefined)
     }
   })
-  */
-
 })
