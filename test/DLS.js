@@ -128,6 +128,52 @@ contract('DLS', function (accounts) {
     assert.equal(sellerHash2, sellerHash)
   })
 
+  it('should add multiple seller hashes to publisher sellers', async () => {
+    const instance = await DLS.deployed()
+
+    const publisher = accounts[1]
+    const pubDomain = 'example.com'
+
+    const sellerDomain_A = 'a.com'
+    const sellerId_A = 'a-123'
+    const sellerRel_A = Relationship.Direct
+
+    const sellerDomain_B = 'b.com'
+    const sellerId_B = 'b-123'
+    const sellerRel_B = Relationship.Reseller
+
+    const sellerDomain_C = 'c.com'
+    const sellerId_C = 'c-123'
+    const sellerRel_C = Relationship.Direct
+
+    const hash_A = soliditySHA3(['string', 'string', 'uint8'], [sellerDomain_A, sellerId_A, sellerRel_A])
+
+    const hash_B = soliditySHA3(['string', 'string', 'uint8'], [sellerDomain_B, sellerId_B, sellerRel_B])
+
+    const hash_C = soliditySHA3(['string', 'string', 'uint8'], [sellerDomain_C, sellerId_C, sellerRel_C])
+
+    const allSellersHash = `0x${hash_A.toString('hex') + hash_B.toString('hex') + hash_C.toString('hex') }`
+
+    var result = await instance.addSellers(allSellersHash, {
+      from: publisher
+    })
+
+    const eventObj = await getLastEvent(instance)
+    assert.equal(eventObj.event, '_SellerAdded')
+
+    const sellerHash_A = `0x${soliditySHA3(['string', 'string', 'uint8'], [sellerDomain_A, sellerId_A, sellerRel_A]).toString('hex')}`
+    const sellerHash_B = `0x${soliditySHA3(['string', 'string', 'uint8'], [sellerDomain_B, sellerId_B, sellerRel_B]).toString('hex')}`
+    const sellerHash_C = `0x${soliditySHA3(['string', 'string', 'uint8'], [sellerDomain_C, sellerId_C, sellerRel_C]).toString('hex')}`
+    const domainHash = `0x${soliditySHA3(['bytes32'], [pubDomain]).toString('hex')}`
+    const sellerHash_Result_A = await instance.sellers.call(domainHash, sellerHash_A)
+    const sellerHash_Result_B = await instance.sellers.call(domainHash, sellerHash_B)
+    const sellerHash_Result_C = await instance.sellers.call(domainHash, sellerHash_C)
+
+    assert.equal(sellerHash_Result_A, sellerHash_A)
+    assert.equal(sellerHash_Result_B, sellerHash_B)
+    assert.equal(sellerHash_Result_C, sellerHash_C)
+  })
+
   it('should remove seller from publisher sellers', async () => {
     const instance = await DLS.deployed()
 
@@ -148,6 +194,18 @@ contract('DLS', function (accounts) {
     assert.equal(hash, 0)
   })
 
+  it('should be able to change owner if owner', async () => {
+    const instance = await DLS.deployed()
+
+    const owner = await instance.owner.call()
+    assert.equal(owner, accounts[0])
+
+    const newOwner = accounts[1]
+    await instance.changeOwner(newOwner)
+    const owner2 = await instance.owner.call()
+    assert.equal(owner2, newOwner)
+  })
+  /*
   it('should deregister publisher from registry', async () => {
     const instance = await DLS.deployed()
 
@@ -170,18 +228,6 @@ contract('DLS', function (accounts) {
     assert.equal(isDomainRegistered, false)
   })
 
-  it('should be able to change owner if owner', async () => {
-    const instance = await DLS.deployed()
-
-    const owner = await instance.owner.call()
-    assert.equal(owner, accounts[0])
-
-    const newOwner = accounts[1]
-    await instance.changeOwner(newOwner)
-    const owner2 = await instance.owner.call()
-    assert.equal(owner2, newOwner)
-  })
-
   it('should not be able to change owner if not owner', async () => {
     const instance = await DLS.deployed()
 
@@ -197,4 +243,6 @@ contract('DLS', function (accounts) {
       assert.notEqual(error, undefined)
     }
   })
+  */
+
 })
