@@ -64,6 +64,19 @@ contract DLS {
     _;
   }
 
+  /**
+   * @notice modifier which checks if sender is
+   * a registered publisher.
+   */
+  modifier isRegistered () {
+    if (domains[msg.sender] == 0) {
+      revert();
+    }
+
+    // continue with code execution
+    _;
+  }
+
   /*
    * @notice The constructor function,
    * called only once when this contract is initially deployed.
@@ -112,39 +125,18 @@ contract DLS {
    * @notice Allow publisher to add a seller by the hash of the seller information.
    * @param hash sha3 hash of seller information
    */
-  function addSeller(bytes32 hash) public {
-    // Check that this ethereum address is a registered publisher.
-    require(domains[msg.sender] != 0);
+  function addSeller(bytes32 hash) isRegistered public {
     sellers[sha3(domains[msg.sender])][hash] = hash;
     _SellerAdded(domains[msg.sender], hash);
   }
 
   /**
-   * @notice Allow publisher to add multiple sellers by providing a string of concatenated hashes of the seller information.
-   * @param hashes string consisting of concatenated hashes of seller information
+   * @notice Allow publisher to add multiple sellers by providing an array of hashes of the seller information.
+   * @param hashes an array of hashes of seller information
    */
-  function addSellers(bytes hashes) external {
-    // Check that this ethereum address is a registered publisher.
-    require(domains[msg.sender] != 0);
-
-    // count how many seller hashes there are
-    uint256 count = (hashes.length / 32);
-    uint256 offset = 32;
-
-    bytes memory h = hashes;
-
-    for (uint256 i = 0; i < count; i++) {
-      bytes32 hash;
-
-      assembly {
-         // read last 32 bytes up to offset and load it to variable
-         hash := mload(add(h, offset))
-      }
-
-      // increment offset by the byte size of hash
-      offset += 32;
-
-      addSeller(hash);
+  function addSellers(bytes32[] hashes) isRegistered public {
+    for (uint256 i = 0; i < hashes.length; i++) {
+      addSeller(hashes[i]);
     }
   }
 
@@ -152,11 +144,19 @@ contract DLS {
    * @notice Remove seller from publisher
    * @param hash sha3 hash of seller information
    */
-  function removeSeller(bytes32 hash) external {
-    // Check that this ethereum address is a registered publisher.
-    require(domains[msg.sender] != 0);
+  function removeSeller(bytes32 hash) isRegistered public {
     delete sellers[sha3(domains[msg.sender])][hash];
     _SellerRemoved(domains[msg.sender], hash);
+  }
+
+  /**
+   * @notice Allow publisher to remove multiple sellers by providing an array of hashes of the seller information.
+   * @param hashes an array of hashes of the seller information
+   */
+  function removeSellers(bytes32[] hashes) isRegistered public {
+    for (uint256 i = 0; i < hashes.length; i++) {
+      removeSeller(hashes[i]);
+    }
   }
 
   /**
