@@ -11,8 +11,6 @@
     "compile": "truffle compile",
     "deploy": "truffle migrate --reset --network=development",
     "deploy:rinkeby": "truffle migrate --reset --network=rinkeby",
-    "watch:app": "watchify -t [babelify] app/src/index.js -o app/public/dist/bundle.js",
-    "build:app": "browserify -t [babelify] app/src/index.js -o app/public/dist/bundle.js",
     "docs": "doxity build",
     "lint": "solium --file contracts/DLS.sol"
   },
@@ -31,20 +29,12 @@
   "homepage": "https://github.com/AdChain/ADSR#readme",
   "devDependencies": {
     "@digix/doxity": "^0.5.2",
-    "babelify": "^7.3.0",
-    "browserify": "^14.4.0",
     "ethereumjs-abi": "^0.6.4",
     "solidity-sha3": "^0.4.1",
     "standard": "^10.0.3",
-    "truffle-contract": "^3.0.0",
-    "truffle-hdwallet-provider": "0.0.3",
-    "watchify": "^3.9.0"
+    "truffle-hdwallet-provider": "0.0.3"
   },
   "dependencies": {
-    "ethereumjs-abi": "^0.6.4",
-    "h": "^0.1.0",
-    "hex2ascii": "0.0.2",
-    "promise-wait": "^1.0.0",
-    "web3-detect-network": "0.0.4"
+
   }
 }

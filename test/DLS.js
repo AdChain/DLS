@@ -154,7 +154,7 @@ contract('DLS', function (accounts) {
 
     const sellersList = [`0x${hash_A.toString('hex')}`, `0x${hash_B.toString('hex')}`, `0x${hash_C.toString('hex')}`]
 
-    var result = await instance.addSellers(sellersList, {
+    const result = await instance.addSellers(sellersList, {
       from: publisher
     })
 
@@ -172,6 +172,21 @@ contract('DLS', function (accounts) {
     assert.equal(sellerHash_Result_A, sellerHash_A)
     assert.equal(sellerHash_Result_B, sellerHash_B)
     assert.equal(sellerHash_Result_C, sellerHash_C)
+
+    // test max number of sellers possible in one tx
+    const sellersList_B = []
+    for (var i = 0; i < 250; i++) {
+      sellersList_B.push(`0x${soliditySHA3(['string'], [`${i}`]).toString('hex')}`)
+    }
+
+    await instance.addSellers(sellersList_B, {
+      from: publisher
+    })
+
+    const sellerHash_Z = sellersList_B[sellersList_B.length-1]
+
+    const sellerHash_Result_Z = await instance.sellers.call(domainHash, sellerHash_Z)
+    assert.equal(sellerHash_Result_Z, sellerHash_Z)
   })
 
   it('should remove seller from publisher sellers', async () => {

@@ -1,5 +1,6 @@
 pragma solidity ^0.4.4;
 
+import "Registry.sol";
 
 contract DLS {
   /*
@@ -55,7 +56,7 @@ contract DLS {
    * @notice modifier which limits execution
    * of the function to the owner.
    */
-  modifier onlyOwner () {
+  modifier onlyOwner() {
     if (msg.sender != owner) {
       revert();
     }
@@ -68,7 +69,7 @@ contract DLS {
    * @notice modifier which checks if sender is
    * a registered publisher.
    */
-  modifier isRegistered () {
+  modifier isRegistered() {
     if (domains[msg.sender] == 0) {
       revert();
     }
@@ -77,12 +78,26 @@ contract DLS {
     _;
   }
 
+  /**
+   * @notice modifier which checks that
+   * publisher doesn't exist.
+   */
+  modifier publisherDoesNotExist(pubKey) {
+    if (domains[pubKey] != 0) {
+      revert();
+    }
+
+    _;
+  }
+
   /*
    * @notice The constructor function,
    * called only once when this contract is initially deployed.
    */
-  function DLS() {
+  function DLS(_db) {
     owner = msg.sender;
+
+    db = _db
   }
 
   /**
@@ -101,8 +116,7 @@ contract DLS {
    * @param domain pubisher domain
    * @param pubKey pubisher public key
    */
-  function registerPublisher(bytes32 domain, address pubKey) onlyOwner external {
-    require(domains[pubKey] == 0);
+  function registerPublisher(bytes32 domain, address pubKey) onlyOwner publisherDoesNotExist(pubKey) external {
     publishers[sha3(domain)] = pubKey;
     domains[pubKey] = domain;
     _PublisherRegistered(domain, pubKey);
@@ -207,3 +221,17 @@ contract DLS {
     return (sellers[sha3(domains[pubKey])][hash] != "");
   }
 }
+
+/*
+environment
+ - desktop
+ - mobile
+
+environment
+ - web
+ - app
+
+format
+ - video
+ - banner
+ */
