@@ -1,6 +1,5 @@
 pragma solidity ^0.4.4;
 
-import "Registry.sol";
 
 contract DLS {
   /*
@@ -82,7 +81,7 @@ contract DLS {
    * @notice modifier which checks that
    * publisher doesn't exist.
    */
-  modifier publisherDoesNotExist(pubKey) {
+  modifier publisherDoesNotExist(address pubKey) {
     if (domains[pubKey] != 0) {
       revert();
     }
@@ -94,10 +93,8 @@ contract DLS {
    * @notice The constructor function,
    * called only once when this contract is initially deployed.
    */
-  function DLS(_db) {
+  function DLS() {
     owner = msg.sender;
-
-    db = _db
   }
 
   /**
@@ -222,16 +219,3 @@ contract DLS {
   }
 }
 
-/*
-environment
- - desktop
- - mobile
-
-environment
- - web
- - app
-
-format
- - video
- - banner
- */
