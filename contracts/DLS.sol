@@ -33,7 +33,7 @@ contract DLS {
     * their hashes of authorized sellers
     *
     * @example example
-    * sellers[sha3(domain)][sellerHash] -> sellerHash
+    * sellers[keccak256(domain)][sellerHash] -> sellerHash
     */
   mapping (bytes32 => mapping (bytes32 => bytes32)) public sellers;
 
@@ -114,7 +114,7 @@ contract DLS {
    * @param pubKey pubisher public key
    */
   function registerPublisher(bytes32 domain, address pubKey) onlyOwner publisherDoesNotExist(pubKey) external {
-    publishers[sha3(domain)] = pubKey;
+    publishers[keccak256(domain)] = pubKey;
     domains[pubKey] = domain;
     _PublisherRegistered(domain, pubKey);
   }
@@ -125,19 +125,19 @@ contract DLS {
    * @param pubKey pubisher public key
    */
   function deregisterPublisher(address pubKey) onlyOwner external {
-    require(publishers[sha3(domains[pubKey])] != address(0));
+    require(publishers[keccak256(domains[pubKey])] != address(0));
     // order matters here, delete pub from map first.
-    delete publishers[sha3(domains[pubKey])];
+    delete publishers[keccak256(domains[pubKey])];
     delete domains[pubKey];
     _PublisherDeregistered(domains[pubKey], pubKey);
   }
 
   /**
    * @notice Allow publisher to add a seller by the hash of the seller information.
-   * @param hash sha3 hash of seller information
+   * @param hash keccak256 hash of seller information
    */
   function addSeller(bytes32 hash) isRegistered public {
-    sellers[sha3(domains[msg.sender])][hash] = hash;
+    sellers[keccak256(domains[msg.sender])][hash] = hash;
     _SellerAdded(domains[msg.sender], hash);
   }
 
@@ -153,10 +153,10 @@ contract DLS {
 
   /**
    * @notice Remove seller from publisher
-   * @param hash sha3 hash of seller information
+   * @param hash keccak256 hash of seller information
    */
   function removeSeller(bytes32 hash) isRegistered public {
-    delete sellers[sha3(domains[msg.sender])][hash];
+    delete sellers[keccak256(domains[msg.sender])][hash];
     _SellerRemoved(domains[msg.sender], hash);
   }
 
@@ -176,7 +176,7 @@ contract DLS {
     * @return publisher public key
     */
   function getPublisherFromDomain(string publisherDomain) public constant returns (address) {
-    return publishers[sha3(publisherDomain)];
+    return publishers[keccak256(publisherDomain)];
   }
 
   /**
@@ -194,7 +194,7 @@ contract DLS {
    * @return bool
    */
   function isRegisteredPublisherDomain(bytes32 domain) external constant returns (bool) {
-    return (publishers[sha3(domain)] != address(0));
+    return (publishers[keccak256(domain)] != address(0));
   }
 
   /**
@@ -214,8 +214,8 @@ contract DLS {
   external
   constant
   returns (bool) {
-    bytes32 hash = sha3(sellerDomain, sellerId, sellerRel);
-    return (sellers[sha3(domains[pubKey])][hash] != "");
+    bytes32 hash = keccak256(sellerDomain, sellerId, sellerRel);
+    return (sellers[keccak256(domains[pubKey])][hash] != "");
   }
 }
 
