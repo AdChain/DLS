@@ -175,7 +175,7 @@ contract('DLS', function (accounts) {
 
     // test max number of sellers possible in one tx
     const sellersList_B = []
-    for (var i = 0; i < 250; i++) {
+    for (var i = 0; i < 150; i++) {
       sellersList_B.push(`0x${soliditySHA3(['string'], [`${i}`]).toString('hex')}`)
     }
 
