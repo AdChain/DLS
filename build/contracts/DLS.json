@@ -1,0 +1,408 @@
+{
+  "contract_name": "DLS",
+  "abi": [
+    {
+      "constant": false,
+      "inputs": [
+        {
+          "name": "pubKey",
+          "type": "address"
+        }
+      ],
+      "name": "deregisterPublisher",
+      "outputs": [],
+      "payable": false,
+      "type": "function"
+    },
+    {
+      "constant": false,
+      "inputs": [
+        {
+          "name": "hash",
+          "type": "bytes32"
+        }
+      ],
+      "name": "addSeller",
+      "outputs": [],
+      "payable": false,
+      "type": "function"
+    },
+    {
+      "constant": false,
+      "inputs": [
+        {
+          "name": "hashes",
+          "type": "bytes32[]"
+        }
+      ],
+      "name": "addSellers",
+      "outputs": [],
+      "payable": false,
+      "type": "function"
+    },
+    {
+      "constant": true,
+      "inputs": [
+        {
+          "name": "",
+          "type": "bytes32"
+        }
+      ],
+      "name": "publishers",
+      "outputs": [
+        {
+          "name": "",
+          "type": "address"
+        }
+      ],
+      "payable": false,
+      "type": "function"
+    },
+    {
+      "constant": true,
+      "inputs": [
+        {
+          "name": "pubKey",
+          "type": "address"
+        },
+        {
+          "name": "sellerDomain",
+          "type": "string"
+        },
+        {
+          "name": "sellerId",
+          "type": "string"
+        },
+        {
+          "name": "sellerRel",
+          "type": "uint8"
+        }
+      ],
+      "name": "isSellerForPublisher",
+      "outputs": [
+        {
+          "name": "",
+          "type": "bool"
+        }
+      ],
+      "payable": false,
+      "type": "function"
+    },
+    {
+      "constant": true,
+      "inputs": [
+        {
+          "name": "domain",
+          "type": "bytes32"
+        }
+      ],
+      "name": "isRegisteredPublisherDomain",
+      "outputs": [
+        {
+          "name": "",
+          "type": "bool"
+        }
+      ],
+      "payable": false,
+      "type": "function"
+    },
+    {
+      "constant": false,
+      "inputs": [
+        {
+          "name": "hashes",
+          "type": "bytes32[]"
+        }
+      ],
+      "name": "removeSellers",
+      "outputs": [],
+      "payable": false,
+      "type": "function"
+    },
+    {
+      "constant": true,
+      "inputs": [],
+      "name": "owner",
+      "outputs": [
+        {
+          "name": "",
+          "type": "address"
+        }
+      ],
+      "payable": false,
+      "type": "function"
+    },
+    {
+      "constant": true,
+      "inputs": [
+        {
+          "name": "pubKey",
+          "type": "address"
+        }
+      ],
+      "name": "isRegisteredPublisher",
+      "outputs": [
+        {
+          "name": "",
+          "type": "bool"
+        }
+      ],
+      "payable": false,
+      "type": "function"
+    },
+    {
+      "constant": true,
+      "inputs": [
+        {
+          "name": "",
+          "type": "bytes32"
+        },
+        {
+          "name": "",
+          "type": "bytes32"
+        }
+      ],
+      "name": "sellers",
+      "outputs": [
+        {
+          "name": "",
+          "type": "bytes32"
+        }
+      ],
+      "payable": false,
+      "type": "function"
+    },
+    {
+      "constant": false,
+      "inputs": [
+        {
+          "name": "newOwner",
+          "type": "address"
+        }
+      ],
+      "name": "changeOwner",
+      "outputs": [],
+      "payable": false,
+      "type": "function"
+    },
+    {
+      "constant": true,
+      "inputs": [
+        {
+          "name": "publisherDomain",
+          "type": "string"
+        }
+      ],
+      "name": "getPublisherFromDomain",
+      "outputs": [
+        {
+          "name": "",
+          "type": "address"
+        }
+      ],
+      "payable": false,
+      "type": "function"
+    },
+    {
+      "constant": true,
+      "inputs": [
+        {
+          "name": "",
+          "type": "address"
+        }
+      ],
+      "name": "domains",
+      "outputs": [
+        {
+          "name": "",
+          "type": "bytes32"
+        }
+      ],
+      "payable": false,
+      "type": "function"
+    },
+    {
+      "constant": false,
+      "inputs": [
+        {
+          "name": "domain",
+          "type": "bytes32"
+        },
+        {
+          "name": "pubKey",
+          "type": "address"
+        }
+      ],
+      "name": "registerPublisher",
+      "outputs": [],
+      "payable": false,
+      "type": "function"
+    },
+    {
+      "constant": false,
+      "inputs": [
+        {
+          "name": "hash",
+          "type": "bytes32"
+        }
+      ],
+      "name": "removeSeller",
+      "outputs": [],
+      "payable": false,
+      "type": "function"
+    },
+    {
+      "inputs": [],
+      "payable": false,
+      "type": "constructor"
+    },
+    {
+      "anonymous": false,
+      "inputs": [
+        {
+          "indexed": true,
+          "name": "publisherDomain",
+          "type": "bytes32"
+        },
+        {
+          "indexed": true,
+          "name": "publisherKey",
+          "type": "address"
+        }
+      ],
+      "name": "_PublisherRegistered",
+      "type": "event"
+    },
+    {
+      "anonymous": false,
+      "inputs": [
+        {
+          "indexed": true,
+          "name": "publisherDomain",
+          "type": "bytes32"
+        },
+        {
+          "indexed": true,
+          "name": "publisherKey",
+          "type": "address"
+        }
+      ],
+      "name": "_PublisherDeregistered",
+      "type": "event"
+    },
+    {
+      "anonymous": false,
+      "inputs": [
+        {
+          "indexed": true,
+          "name": "publisherDomain",
+          "type": "bytes32"
+        },
+        {
+          "indexed": true,
+          "name": "sellerHash",
+          "type": "bytes32"
+        }
+      ],
+      "name": "_SellerAdded",
+      "type": "event"
+    },
+    {
+      "anonymous": false,
+      "inputs": [
+        {
+          "indexed": true,
+          "name": "publisherDomain",
+          "type": "bytes32"
+        },
+        {
+          "indexed": true,
+          "name": "sellerHash",
+          "type": "bytes32"
+        }
+      ],
+      "name": "_SellerRemoved",
+      "type": "event"
+    }
+  ],
+  "unlinked_binary": "0x6060604052341561000f57600080fd5b5b60038054600160a060020a03191633600160a060020a03161790555b5b610a878061003c6000396000f300606060405236156100d85763ffffffff7c010000000000000000000000000000000000000000000000000000000060003504166312d4119481146100dd5780632aab8cae146100fe578063312e0fa214610116578063410d4fdd146101675780634e7fabbf1461019957806361e2d43d146101ea5780636fc5c424146102145780638da5cb5b146102655780639fb9141014610294578063a08508fd146102c7578063a6f9dae1146102f2578063e267c06e14610313578063e2ffea6e14610380578063ee83fba2146103b1578063fa837bb8146103d5575b600080fd5b34156100e857600080fd5b6100fc600160a060020a03600435166103ed565b005b341561010957600080fd5b6100fc600435610501565b005b341561012157600080fd5b6100fc60046024813581810190830135806020818102016040519081016040528093929190818152602001838360200280828437509496506105c095505050505050565b005b341561017257600080fd5b61017d60043561061e565b604051600160a060020a03909116815260200160405180910390f35b34156101a457600080fd5b6101d660048035600160a060020a0316906024803580820192908101359160443590810191013560643560ff16610639565b604051901515815260200160405180910390f35b34156101f557600080fd5b6101d6600435610700565b604051901515815260200160405180910390f35b341561021f57600080fd5b6100fc600460248135818101908301358060208181020160405190810160405280939291908181526020018383602002808284375094965061073c95505050505050565b005b341561027057600080fd5b61017d61079a565b604051600160a060020a03909116815260200160405180910390f35b341561029f57600080fd5b6101d6600160a060020a03600435166107a9565b604051901515815260200160405180910390f35b34156102d257600080fd5b6102e06004356024356107ca565b60405190815260200160405180910390f35b34156102fd57600080fd5b6100fc600160a060020a03600435166107e7565b005b341561031e57600080fd5b61017d60046024813581810190830135806020601f8201819004810201604051908101604052818152929190602084018383808284375094965061082f95505050505050565b604051600160a060020a03909116815260200160405180910390f35b341561038b57600080fd5b6102e0600160a060020a03600435166108b4565b60405190815260200160405180910390f35b34156103bc57600080fd5b6100fc600435600160a060020a03602435166108c6565b005b34156103e057600080fd5b6100fc6004356109a1565b005b60035433600160a060020a0390811691161461040857600080fd5b600160a060020a038116600090815260016020526040808220548291829190519081526020016040519081900390208152602081019190915260400160002054600160a060020a0316141561045c57600080fd5b600160a060020a03811660009081526001602052604080822054829151908152602001604051908190039020815260208082019290925260409081016000908120805473ffffffffffffffffffffffffffffffffffffffff19169055600160a060020a0384168082526001909352818120819055907ff989fc40c0476eec7d41f36cedea30938a3e2932440da07d4c4e04692baec6ac905160405180910390a35b5b50565b600160a060020a033316600090815260016020526040902054151561052557600080fd5b600160a060020a03331660009081526001602052604080822054839260029290919051908152602001604051908190039020815260208082019290925260409081016000908120858252835281812093909355600160a060020a03331683526001909152908190205482917f22228fd81134ae325338d49aaa967eaf86afb3d25594f321309f352780a0f1e4905160405180910390a35b5b50565b600160a060020a03331660009081526001602052604081205415156105e457600080fd5b5060005b81518110156106185761060f82828151811061060057fe5b90602001906020020151610501565b5b6001016105e8565b5b5b5050565b600060208190529081526040902054600160a060020a031681565b6000808686868686604051808686808284378201915050848480828437820191505082600281111561066757fe5b60ff167f010000000000000000000000000000000000000000000000000000000000000002815260010195505050505050604051908190039020600160a060020a038916600090815260016020526040808220549293506002929051908152602001604051908190039020815260208082019290925260409081016000908120848252909252902054151591505b509695505050505050565b6000808080846040519081526020016040519081900390208152602081019190915260400160002054600160a060020a0316141590505b919050565b600160a060020a033316600090815260016020526040812054151561076057600080fd5b5060005b81518110156106185761078b82828151811061077c57fe5b906020019060200201516109a1565b5b600101610764565b5b5b5050565b600354600160a060020a031681565b600160a060020a03811660009081526001602052604090205415155b919050565b600260209081526000928352604080842090915290825290205481565b60035433600160a060020a0390811691161461080257600080fd5b6003805473ffffffffffffffffffffffffffffffffffffffff1916600160a060020a0383161790555b5b50565b6000806000836040518082805190602001908083835b6020831061086557805182525b601f199092019160209182019101610845565b6001836020036101000a03801982511681845116179092525050509190910192506040915050519081900390208152602081019190915260400160002054600160a060020a031690505b919050565b60016020526000908152604090205481565b60035433600160a060020a039081169116146108e157600080fd5b600160a060020a03811660009081526001602052604090205481901561090657600080fd5b8160008085604051908152602001604051908190039020815260208082019290925260409081016000908120805473ffffffffffffffffffffffffffffffffffffffff1916600160a060020a039586161790559285168084526001909252918290208590559084907fe931c010e73e42b8cacbc4d4db8c85a025695edd1fdab0a138ff00c6a7979ef6905160405180910390a35b5b505b5050565b600160a060020a03331660009081526001602052604090205415156109c557600080fd5b600160a060020a0333166000908152600160205260408082205460029291519081526020016040519081900390208152602080820192909252604090810160009081208482528352818120819055600160a060020a03331681526001909252908190205482917f322619e9cf51dfe3d1a685bee3aa423355e1e85fb80592c7482d0b2f748d5783905160405180910390a35b5b505600a165627a7a72305820d0945ac2f6ebd42b31ad55994cc54810f29e619fa8fe3baafe33f7367a74556c0029",
+  "networks": {
+    "4": {
+      "events": {
+        "0xe931c010e73e42b8cacbc4d4db8c85a025695edd1fdab0a138ff00c6a7979ef6": {
+          "anonymous": false,
+          "inputs": [
+            {
+              "indexed": true,
+              "name": "publisherDomain",
+              "type": "bytes32"
+            },
+            {
+              "indexed": true,
+              "name": "publisherKey",
+              "type": "address"
+            }
+          ],
+          "name": "_PublisherRegistered",
+          "type": "event"
+        },
+        "0xf989fc40c0476eec7d41f36cedea30938a3e2932440da07d4c4e04692baec6ac": {
+          "anonymous": false,
+          "inputs": [
+            {
+              "indexed": true,
+              "name": "publisherDomain",
+              "type": "bytes32"
+            },
+            {
+              "indexed": true,
+              "name": "publisherKey",
+              "type": "address"
+            }
+          ],
+          "name": "_PublisherDeregistered",
+          "type": "event"
+        },
+        "0x22228fd81134ae325338d49aaa967eaf86afb3d25594f321309f352780a0f1e4": {
+          "anonymous": false,
+          "inputs": [
+            {
+              "indexed": true,
+              "name": "publisherDomain",
+              "type": "bytes32"
+            },
+            {
+              "indexed": true,
+              "name": "sellerHash",
+              "type": "bytes32"
+            }
+          ],
+          "name": "_SellerAdded",
+          "type": "event"
+        },
+        "0x322619e9cf51dfe3d1a685bee3aa423355e1e85fb80592c7482d0b2f748d5783": {
+          "anonymous": false,
+          "inputs": [
+            {
+              "indexed": true,
+              "name": "publisherDomain",
+              "type": "bytes32"
+            },
+            {
+              "indexed": true,
+              "name": "sellerHash",
+              "type": "bytes32"
+            }
+          ],
+          "name": "_SellerRemoved",
+          "type": "event"
+        }
+      },
+      "links": {},
+      "address": "0x8affb9c5b4b03cf71d2ba8d4918eb27e6f5a8726",
+      "updated_at": 1511310021640
+    }
+  },
+  "schema_version": "0.0.5",
+  "updated_at": 1511310021640
+}
