@@ -1,4 +1,4 @@
-# DLS - Distributed List of Sellers
+# Ads.txt Plus
 
 > [ads.txt](https://iabtechlab.com/ads-txt/) - on the blockchain.
 
@@ -20,7 +20,7 @@ Smart contract documentation
 
 ## Terminology
 
- - *sellerId* is also known as *SellerAccountID* in ads.txt
+ - *sellerId* is also known as *Publisher’s Account ID* in ads.txt
  - *sellerDomain* is also known as *SSP/Exchange Domain* in ads.txt
  - *sellerRelationship* is also known as *PaymentsType* in ads.txt
  - *sellerTagId* is also known as *TAGID* in ads.txt
