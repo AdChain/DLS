@@ -21,8 +21,8 @@ Smart contract documentation
 ## Terminology
  
  - *sellerDomain* is also known as *SSP/Exchange Domain* in ads.txt
- - *PubAccountID* is also known as *Publisher’s Account ID* in ads.txt
- - *sellerRelationship* is also known as *PaymentsType* in ads.txt
+ - *PubsAccountID* is also known as *Publisher’s Account ID* in ads.txt
+ - *sellerPaymentType* is also known as *PaymentsType* in ads.txt
 
 # Test
 
