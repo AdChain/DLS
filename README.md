@@ -4,7 +4,7 @@
 
 # Site
 
-[https://dls.adchain.com](https://dls.adchain.com)
+[https://adstxt.plus](https://adstxt.plus)
 
 # Address
 
@@ -19,9 +19,9 @@ Smart contract documentation
 [https://dls.adchain.com/docs/DLS](https://dls.adchain.com/docs/DLS)
 
 ## Terminology
-
- - *sellerId* is also known as *Publisher’s Account ID* in ads.txt
+ 
  - *sellerDomain* is also known as *SSP/Exchange Domain* in ads.txt
+ - *sellerId* is also known as *Publisher’s Account ID* in ads.txt
  - *sellerRelationship* is also known as *PaymentsType* in ads.txt
  - *sellerTagId* is also known as *TAGID* in ads.txt
 
