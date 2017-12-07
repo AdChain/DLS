@@ -47,6 +47,7 @@ contract DLS {
    * Clients can listen on specific events to fetch data.
    */
   event _PublisherRegistered(bytes32 indexed publisherDomain, address indexed publisherKey);
+  event _PublisherUpdated(bytes32 indexed publisherDomain, address indexed publisherKey);
   event _PublisherDeregistered(bytes32 indexed publisherDomain, address indexed publisherKey);
   event _SellerAdded(bytes32 indexed publisherDomain, bytes32 indexed sellerHash);
   event _SellerRemoved(bytes32 indexed publisherDomain, bytes32 indexed sellerHash);
@@ -117,6 +118,29 @@ contract DLS {
     publishers[keccak256(domain)] = pubKey;
     domains[pubKey] = domain;
     _PublisherRegistered(domain, pubKey);
+  }
+
+  /**
+   * @notice Update new publisher.
+   * Only the owner of the contract can update publishers.
+   * Publisher public key must already exist in order to
+   * be modified.
+   * @param domain pubisher domain
+   * @param pubKey pubisher public key
+   */
+  function updatePublisher(bytes32 domain, address pubKey) onlyOwner external {
+    bytes32 domainHash = keccak256(domain);
+    require(publishers[domainHash] != address(0));
+
+    // remove old publisher key
+    address oldPubKey = publishers[domainHash];
+    delete domains[oldPubKey];
+
+    // Update Publisher pubKey 
+    publishers[domainHash] = pubKey;
+    domains[pubKey] = domain;
+
+    _PublisherUpdated(domain, pubKey);
   }
 
   /**
@@ -213,7 +237,8 @@ contract DLS {
   )
   external
   constant
-  returns (bool) {
+  returns (bool) 
+  {
     bytes32 hash = keccak256(sellerDomain, sellerId, sellerRel);
     return (sellers[keccak256(domains[pubKey])][hash] != "");
   }

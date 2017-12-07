@@ -10,6 +10,18 @@ const Relationship = {
   Reseller: 2
 }
 
+const sellerDomain_A = 'a.com'
+const sellerId_A = 'a-123'
+const sellerRel_A = Relationship.Direct
+
+const sellerDomain_B = 'b.com'
+const sellerId_B = 'b-123'
+const sellerRel_B = Relationship.Reseller
+
+const sellerDomain_C = 'c.com'
+const sellerId_C = 'c-123'
+const sellerRel_C = Relationship.Direct
+
 function getLastEvent(instance) {
   return new Promise((resolve, reject) => {
     instance.allEvents()
@@ -46,6 +58,33 @@ contract('DLS', function (accounts) {
 
     const isDomainRegistered2 = await instance.isRegisteredPublisherDomain(domain)
     assert.equal(isDomainRegistered2, true)
+  })
+
+  it('should update publisher to registry', async () => {
+    const instance = await DLS.deployed()
+
+    const publisher = accounts[1]
+    const updateToPublisher = accounts[2]
+    const domain = 'example.com'
+    const domainHash = `0x${soliditySHA3(['bytes32'], [domain]).toString('hex')}`
+
+    // Update publisher
+    await instance.updatePublisher(domain, updateToPublisher, {from: owner})
+    const publisher3 = await instance.publishers.call(domainHash)
+
+    assert.equal(publisher3, updateToPublisher)
+
+    const isRegistered3 = await instance.isRegisteredPublisher(publisher)
+    assert.equal(isRegistered3, false)
+
+    const isRegistered4 = await instance.isRegisteredPublisher(updateToPublisher)
+    assert.equal(isRegistered4, true)
+
+    // Update publisher back
+    await instance.updatePublisher(domain, publisher, {from: owner})
+    const publisher4 = await instance.publishers.call(domainHash)
+
+    assert.equal(publisher4, publisher)
   })
 
   it('should not be able add publisher to registry with same public key', async () => {
@@ -134,18 +173,6 @@ contract('DLS', function (accounts) {
     const publisher = accounts[1]
     const pubDomain = 'example.com'
 
-    const sellerDomain_A = 'a.com'
-    const sellerId_A = 'a-123'
-    const sellerRel_A = Relationship.Direct
-
-    const sellerDomain_B = 'b.com'
-    const sellerId_B = 'b-123'
-    const sellerRel_B = Relationship.Reseller
-
-    const sellerDomain_C = 'c.com'
-    const sellerId_C = 'c-123'
-    const sellerRel_C = Relationship.Direct
-
     const hash_A = soliditySHA3(['string', 'string', 'uint8'], [sellerDomain_A, sellerId_A, sellerRel_A])
 
     const hash_B = soliditySHA3(['string', 'string', 'uint8'], [sellerDomain_B, sellerId_B, sellerRel_B])
@@ -187,6 +214,41 @@ contract('DLS', function (accounts) {
 
     const sellerHash_Result_Z = await instance.sellers.call(domainHash, sellerHash_Z)
     assert.equal(sellerHash_Result_Z, sellerHash_Z)
+  })
+
+  it('should update publisher to registry and sellers transferred along with it', async () => {
+    const instance = await DLS.deployed()
+
+    const publisher = accounts[1]
+    const updateToPublisher = accounts[2]
+    const domain = 'example.com'
+    const domainHash = `0x${soliditySHA3(['bytes32'], [domain]).toString('hex')}`
+
+    // Update publisher
+    await instance.updatePublisher(domain, updateToPublisher, {from: owner})
+    const publisher3 = await instance.publishers.call(domainHash)
+
+    assert.equal(publisher3, updateToPublisher)
+
+    const isRegistered3 = await instance.isRegisteredPublisher(publisher)
+    assert.equal(isRegistered3, false)
+
+    const isRegistered4 = await instance.isRegisteredPublisher(updateToPublisher)
+    assert.equal(isRegistered4, true)
+
+    // Old publisher shoulnd't have sellers
+    const isSeller = await instance.isSellerForPublisher.call(publisher, sellerDomain_A, sellerId_A, sellerRel_A)
+    assert.equal(isSeller, false)
+
+    // New publisher should have sellers
+    const isSeller2 = await instance.isSellerForPublisher.call(updateToPublisher, sellerDomain_A, sellerId_A, sellerRel_A)
+    assert.equal(isSeller2, true)
+
+    // Update publisher back
+    await instance.updatePublisher(domain, publisher, {from: owner})
+    const publisher4 = await instance.publishers.call(domainHash)
+
+    assert.equal(publisher4, publisher)
   })
 
   it('should remove seller from publisher sellers', async () => {
