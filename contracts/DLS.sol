@@ -25,8 +25,9 @@ contract DLS {
    *
    * @example
    * "0x123...abc" -> "nytimes.com"
+   * domains[pubKey][domainHash] = domain
    */
-  mapping (address => bytes32) public domains;
+  mapping (address => mapping (bytes32 => bytes32)) public domains;
 
    /**
     * @notice a mapping of publsher domains to
@@ -69,8 +70,8 @@ contract DLS {
    * @notice modifier which checks if sender is
    * a registered publisher.
    */
-  modifier isRegistered() {
-    if (domains[msg.sender] == 0) {
+  modifier isRegistered(bytes32 domain) {
+    if (domains[msg.sender][keccak256(domain)] == 0) {
       revert();
     }
 
@@ -82,8 +83,8 @@ contract DLS {
    * @notice modifier which checks that
    * publisher doesn't exist.
    */
-  modifier publisherDoesNotExist(address pubKey) {
-    if (domains[pubKey] != 0) {
+  modifier publisherDoesNotExist(address pubKey, bytes32 domain) {
+    if (domains[pubKey][keccak256(domain)] != 0) {
       revert();
     }
 
@@ -114,9 +115,10 @@ contract DLS {
    * @param domain pubisher domain
    * @param pubKey pubisher public key
    */
-  function registerPublisher(bytes32 domain, address pubKey) onlyOwner publisherDoesNotExist(pubKey) external {
-    publishers[keccak256(domain)] = pubKey;
-    domains[pubKey] = domain;
+  function registerPublisher(bytes32 domain, address pubKey) onlyOwner publisherDoesNotExist(pubKey, domain) external {
+    bytes32 domainHash = keccak256(domain);
+    publishers[domainHash] = pubKey;
+    domains[pubKey][domainHash] = domain;
     _PublisherRegistered(domain, pubKey);
   }
 
@@ -134,11 +136,11 @@ contract DLS {
 
     // remove old publisher key
     address oldPubKey = publishers[domainHash];
-    delete domains[oldPubKey];
+    delete domains[oldPubKey][domainHash];
 
     // Update Publisher pubKey 
     publishers[domainHash] = pubKey;
-    domains[pubKey] = domain;
+    domains[pubKey][domainHash] = domain;
 
     _PublisherUpdated(domain, pubKey);
   }
@@ -148,30 +150,33 @@ contract DLS {
    * Only contract owner is allowed to deregister.
    * @param pubKey pubisher public key
    */
-  function deregisterPublisher(address pubKey) onlyOwner external {
-    require(publishers[keccak256(domains[pubKey])] != address(0));
+  function deregisterPublisher(address pubKey, bytes32 domain) onlyOwner external {
+    bytes32 domainHash = keccak256(domain);
+    require(publishers[keccak256(domains[pubKey][domainHash])] != address(0));
     // order matters here, delete pub from map first.
-    delete publishers[keccak256(domains[pubKey])];
-    delete domains[pubKey];
-    _PublisherDeregistered(domains[pubKey], pubKey);
+    delete publishers[keccak256(domains[pubKey][domainHash])];
+    delete domains[pubKey][domainHash];
+    _PublisherDeregistered(domains[pubKey][domainHash], pubKey);
   }
 
   /**
    * @notice Allow publisher to add a seller by the hash of the seller information.
    * @param hash keccak256 hash of seller information
+   * @param domain bytes32 domain of seller information
    */
-  function addSeller(bytes32 hash) isRegistered public {
-    sellers[keccak256(domains[msg.sender])][hash] = hash;
-    _SellerAdded(domains[msg.sender], hash);
+  function addSeller(bytes32 hash, bytes32 domain) isRegistered(domain) public {
+    bytes32 domainHash = keccak256(domain);
+    sellers[keccak256(domains[msg.sender][domainHash])][hash] = hash;
+    _SellerAdded(domains[msg.sender][domainHash], hash);
   }
 
   /**
    * @notice Allow publisher to add multiple sellers by providing an array of hashes of the seller information.
    * @param hashes an array of hashes of seller information
    */
-  function addSellers(bytes32[] hashes) isRegistered public {
+  function addSellers(bytes32[] hashes, bytes32 domain) isRegistered(domain) public {
     for (uint256 i = 0; i < hashes.length; i++) {
-      addSeller(hashes[i]);
+      addSeller(hashes[i], domain);
     }
   }
 
@@ -179,18 +184,19 @@ contract DLS {
    * @notice Remove seller from publisher
    * @param hash keccak256 hash of seller information
    */
-  function removeSeller(bytes32 hash) isRegistered public {
-    delete sellers[keccak256(domains[msg.sender])][hash];
-    _SellerRemoved(domains[msg.sender], hash);
+  function removeSeller(bytes32 hash, bytes32 domain) isRegistered(domain) public {
+    bytes32 domainHash = keccak256(domain);
+    delete sellers[keccak256(domains[msg.sender][domainHash])][hash];
+    _SellerRemoved(domains[msg.sender][domainHash], hash);
   }
 
   /**
    * @notice Allow publisher to remove multiple sellers by providing an array of hashes of the seller information.
    * @param hashes an array of hashes of the seller information
    */
-  function removeSellers(bytes32[] hashes) isRegistered public {
+  function removeSellers(bytes32[] hashes, bytes32 domain) isRegistered(domain) public {
     for (uint256 i = 0; i < hashes.length; i++) {
-      removeSeller(hashes[i]);
+      removeSeller(hashes[i], domain);
     }
   }
 
@@ -206,10 +212,11 @@ contract DLS {
   /**
    * @notice Check if publisher is registered.
    * @param pubKey pubisher public key
+   * @param domain domain of publisher   
    * @return bool
    */
-  function isRegisteredPublisher(address pubKey) external constant returns (bool) {
-    return (domains[pubKey] != "");
+  function isRegisteredPublisher(address pubKey, bytes32 domain) external constant returns (bool) {
+    return (domains[pubKey][keccak256(domain)] != "");
   }
 
   /**
@@ -224,6 +231,7 @@ contract DLS {
   /**
    * @notice Return true if is seller for publisher
    * @param pubKey publisher public key
+   * @param domain publisher domain 
    * @param sellerDomain domain of seller
    * @param sellerId ID of seller
    * @param sellerRel Relationship of seller. (Direct: 0, Reseller: 1)
@@ -231,6 +239,7 @@ contract DLS {
    */
   function isSellerForPublisher(
     address pubKey,
+    bytes32 domain,
     string sellerDomain,
     string sellerId,
     Relationship sellerRel
@@ -239,8 +248,9 @@ contract DLS {
   constant
   returns (bool) 
   {
+    bytes32 domainHash = keccak256(domain);
     bytes32 hash = keccak256(sellerDomain, sellerId, sellerRel);
-    return (sellers[keccak256(domains[pubKey])][hash] != "");
+    return (sellers[keccak256(domains[pubKey][domainHash])][hash] != "");
   }
 }
 

@@ -41,7 +41,7 @@ contract('DLS', function (accounts) {
     const publisher = accounts[1]
     const domain = 'example.com'
 
-    const isRegistered = await instance.isRegisteredPublisher(publisher)
+    const isRegistered = await instance.isRegisteredPublisher(publisher, domain)
     assert.equal(isRegistered, false)
 
     const isDomainRegistered = await instance.isRegisteredPublisherDomain(domain)
@@ -53,7 +53,7 @@ contract('DLS', function (accounts) {
 
     assert.equal(publisher2, publisher)
 
-    const isRegistered2 = await instance.isRegisteredPublisher(publisher)
+    const isRegistered2 = await instance.isRegisteredPublisher(publisher, domain)
     assert.equal(isRegistered2, true)
 
     const isDomainRegistered2 = await instance.isRegisteredPublisherDomain(domain)
@@ -74,10 +74,10 @@ contract('DLS', function (accounts) {
 
     assert.equal(publisher3, updateToPublisher)
 
-    const isRegistered3 = await instance.isRegisteredPublisher(publisher)
+    const isRegistered3 = await instance.isRegisteredPublisher(publisher, domain)
     assert.equal(isRegistered3, false)
 
-    const isRegistered4 = await instance.isRegisteredPublisher(updateToPublisher)
+    const isRegistered4 = await instance.isRegisteredPublisher(updateToPublisher, domain)
     assert.equal(isRegistered4, true)
 
     // Update publisher back
@@ -87,7 +87,7 @@ contract('DLS', function (accounts) {
     assert.equal(publisher4, publisher)
   })
 
-  it('should not be able add publisher to registry with same public key', async () => {
+  it('should be able add publisher to registry with same public key', async () => {
     const instance = await DLS.deployed()
 
     // same pub key as prevous test
@@ -96,7 +96,7 @@ contract('DLS', function (accounts) {
     const actualDomain = 'example.com'
     const domainHash = `0x${soliditySHA3(['bytes32'], [domain]).toString('hex')}`
 
-    const isRegistered = await instance.isRegisteredPublisher(publisher)
+    const isRegistered = await instance.isRegisteredPublisher(publisher, actualDomain)
     assert.equal(isRegistered, true)
 
     const isDomainRegistered = await instance.isRegisteredPublisherDomain(domain)
@@ -110,13 +110,16 @@ contract('DLS', function (accounts) {
 
     const publisher2 = await instance.publishers.call(domainHash)
 
-    assert.equal(parseInt(publisher2, 16), 0)
+    assert.equal(parseInt(publisher2, 16), publisher)
 
-    const isRegistered2 = await instance.isRegisteredPublisher(publisher)
+    const isRegistered2 = await instance.isRegisteredPublisher(publisher, domain)
     assert.equal(isRegistered2, true)
 
+    const isRegistered3 = await instance.isRegisteredPublisher(publisher, actualDomain)
+    assert.equal(isRegistered3, true)
+
     const isDomainRegistered2 = await instance.isRegisteredPublisherDomain(domain)
-    assert.equal(isDomainRegistered2, false)
+    assert.equal(isDomainRegistered2, true)
 
     const isDomainRegistered3 = await instance.isRegisteredPublisherDomain(actualDomain)
     assert.equal(isDomainRegistered3, true)
@@ -136,7 +139,7 @@ contract('DLS', function (accounts) {
     let _err = null
 
     try {
-      await instance.addSeller(hash, {from: publisher})
+      await instance.addSeller(hash, pubDomain, {from: publisher})
     } catch (error) {
       _err = error
     }
@@ -155,7 +158,7 @@ contract('DLS', function (accounts) {
 
     const hash = `0x${soliditySHA3(['string', 'string', 'uint8'], [sellerDomain, sellerId, rel]).toString('hex')}`
 
-    await instance.addSeller(hash, {from: publisher})
+    await instance.addSeller(hash, pubDomain, {from: publisher})
 
     const eventObj = await getLastEvent(instance)
     assert.equal(eventObj.event, '_SellerAdded')
@@ -181,7 +184,7 @@ contract('DLS', function (accounts) {
 
     const sellersList = [`0x${hash_A.toString('hex')}`, `0x${hash_B.toString('hex')}`, `0x${hash_C.toString('hex')}`]
 
-    const result = await instance.addSellers(sellersList, {
+    const result = await instance.addSellers(sellersList, pubDomain, {
       from: publisher
     })
 
@@ -206,7 +209,7 @@ contract('DLS', function (accounts) {
       sellersList_B.push(`0x${soliditySHA3(['string'], [`${i}`]).toString('hex')}`)
     }
 
-    await instance.addSellers(sellersList_B, {
+    await instance.addSellers(sellersList_B, pubDomain, {
       from: publisher
     })
 
@@ -227,27 +230,25 @@ contract('DLS', function (accounts) {
     // Update publisher
     await instance.updatePublisher(domain, updateToPublisher, {from: owner})
     const publisher3 = await instance.publishers.call(domainHash)
-
     assert.equal(publisher3, updateToPublisher)
 
-    const isRegistered3 = await instance.isRegisteredPublisher(publisher)
+    const isRegistered3 = await instance.isRegisteredPublisher(publisher, domain)
     assert.equal(isRegistered3, false)
 
-    const isRegistered4 = await instance.isRegisteredPublisher(updateToPublisher)
+    const isRegistered4 = await instance.isRegisteredPublisher(updateToPublisher, domain)
     assert.equal(isRegistered4, true)
 
     // Old publisher shoulnd't have sellers
-    const isSeller = await instance.isSellerForPublisher.call(publisher, sellerDomain_A, sellerId_A, sellerRel_A)
+    const isSeller = await instance.isSellerForPublisher.call(publisher, domain, sellerDomain_A, sellerId_A, sellerRel_A)
     assert.equal(isSeller, false)
 
     // New publisher should have sellers
-    const isSeller2 = await instance.isSellerForPublisher.call(updateToPublisher, sellerDomain_A, sellerId_A, sellerRel_A)
+    const isSeller2 = await instance.isSellerForPublisher.call(updateToPublisher, domain, sellerDomain_A, sellerId_A, sellerRel_A)
     assert.equal(isSeller2, true)
 
-    // Update publisher back
+    //  update publisher back to original account
     await instance.updatePublisher(domain, publisher, {from: owner})
-    const publisher4 = await instance.publishers.call(domainHash)
-
+    const publisher4 = await instance.publishers.call(domainHash)    
     assert.equal(publisher4, publisher)
   })
 
@@ -255,20 +256,21 @@ contract('DLS', function (accounts) {
     const instance = await DLS.deployed()
 
     const publisher = accounts[1]
+    const domain = 'example.com'
     const sellerId = accounts[2]
     const sellerDomain = 'example.com'
     const rel = Relationship.Reseller
 
     const sellerHash = `0x${soliditySHA3(['string', 'string', 'uint8'], [sellerDomain, sellerId, rel]).toString('hex')}`
 
-    await instance.removeSeller(sellerHash, {from: publisher})
+    await instance.removeSeller(sellerHash, domain, {from: publisher})
 
-    const isSeller = await instance.isSellerForPublisher.call(publisher, sellerDomain, sellerId, rel)
+    const isSeller = await instance.isSellerForPublisher.call(publisher, domain, sellerDomain, sellerId, rel)
     assert.equal(isSeller, false)
 
     const hash = await instance.sellers.call(publisher, sellerId)
 
-    assert.equal(hash, 0)
+    assert.equal(parseInt(hash, 16), 0)
   })
 
   it('should remove multiple seller hashes from publisher sellers', async () => {
@@ -297,7 +299,7 @@ contract('DLS', function (accounts) {
 
     const sellersList = [`0x${hash_A.toString('hex')}`, `0x${hash_B.toString('hex')}`, `0x${hash_C.toString('hex')}`]
 
-    var result = await instance.removeSellers(sellersList, {
+    var result = await instance.removeSellers(sellersList, pubDomain, {
       from: publisher
     })
 
@@ -324,16 +326,16 @@ contract('DLS', function (accounts) {
     const publisher = accounts[1]
     const domain = 'example.com'
 
-    await instance.deregisterPublisher(publisher, {from: owner})
+    await instance.deregisterPublisher(publisher, domain, {from: owner})
     const domainHash = `0x${soliditySHA3(['bytes32'], [domain]).toString('hex')}`
     const [publisher2] = await instance.publishers.call(domainHash)
 
     assert.equal(publisher2, 0)
 
-    const domain2 = await instance.domains.call(publisher)
+    const domain2 = await instance.domains.call(publisher, domainHash)
     assert.equal(parseInt(domain2, 16), 0)
 
-    const isRegistered = await instance.isRegisteredPublisher(publisher)
+    const isRegistered = await instance.isRegisteredPublisher(publisher, domain)
     assert.equal(isRegistered, false)
 
     const isDomainRegistered = await instance.isRegisteredPublisherDomain(domain)
