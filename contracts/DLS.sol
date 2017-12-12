@@ -21,7 +21,7 @@ contract DLS {
   mapping (bytes32 => address) public publishers;
 
   /**
-   * @notice a mapping of publisher public keys to domains
+   * @notice a mapping of publisher public keys and domainHash to domains
    *
    * @example
    * "0x123...abc" -> "nytimes.com"
@@ -156,6 +156,7 @@ contract DLS {
     // order matters here, delete pub from map first.
     delete publishers[keccak256(domains[pubKey][domainHash])];
     delete domains[pubKey][domainHash];
+
     _PublisherDeregistered(domains[pubKey][domainHash], pubKey);
   }
 
@@ -242,15 +243,15 @@ contract DLS {
     bytes32 domain,
     string sellerDomain,
     string sellerId,
-    Relationship sellerRel
+    Relationship sellerRel,
+    string optional
   )
   external
   constant
   returns (bool) 
   {
-    bytes32 domainHash = keccak256(domain);
-    bytes32 hash = keccak256(sellerDomain, sellerId, sellerRel);
-    return (sellers[keccak256(domains[pubKey][domainHash])][hash] != "");
+    bytes32 hash = keccak256(sellerDomain, sellerId, sellerRel, optional);
+    return (sellers[keccak256(domains[pubKey][keccak256(domain)])][hash] != "");
   }
 }
 
