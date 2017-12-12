@@ -22,6 +22,15 @@ const sellerDomain_C = 'c.com'
 const sellerId_C = 'c-123'
 const sellerRel_C = Relationship.Direct
 
+const hash_A = soliditySHA3(['string', 'string', 'uint8'], [sellerDomain_A, sellerId_A, sellerRel_A])
+const hash_B = soliditySHA3(['string', 'string', 'uint8'], [sellerDomain_B, sellerId_B, sellerRel_B])
+const hash_C = soliditySHA3(['string', 'string', 'uint8'], [sellerDomain_C, sellerId_C, sellerRel_C])
+
+const sellerHash_A = `0x${soliditySHA3(['string', 'string', 'uint8'], [sellerDomain_A, sellerId_A, sellerRel_A]).toString('hex')}`
+const sellerHash_B = `0x${soliditySHA3(['string', 'string', 'uint8'], [sellerDomain_B, sellerId_B, sellerRel_B]).toString('hex')}`
+const sellerHash_C = `0x${soliditySHA3(['string', 'string', 'uint8'], [sellerDomain_C, sellerId_C, sellerRel_C]).toString('hex')}`
+
+
 function getLastEvent(instance) {
   return new Promise((resolve, reject) => {
     instance.allEvents()
@@ -176,12 +185,6 @@ contract('DLS', function (accounts) {
     const publisher = accounts[1]
     const pubDomain = 'example.com'
 
-    const hash_A = soliditySHA3(['string', 'string', 'uint8'], [sellerDomain_A, sellerId_A, sellerRel_A])
-
-    const hash_B = soliditySHA3(['string', 'string', 'uint8'], [sellerDomain_B, sellerId_B, sellerRel_B])
-
-    const hash_C = soliditySHA3(['string', 'string', 'uint8'], [sellerDomain_C, sellerId_C, sellerRel_C])
-
     const sellersList = [`0x${hash_A.toString('hex')}`, `0x${hash_B.toString('hex')}`, `0x${hash_C.toString('hex')}`]
 
     const result = await instance.addSellers(sellersList, pubDomain, {
@@ -191,9 +194,6 @@ contract('DLS', function (accounts) {
     const eventObj = await getLastEvent(instance)
     assert.equal(eventObj.event, '_SellerAdded')
 
-    const sellerHash_A = `0x${soliditySHA3(['string', 'string', 'uint8'], [sellerDomain_A, sellerId_A, sellerRel_A]).toString('hex')}`
-    const sellerHash_B = `0x${soliditySHA3(['string', 'string', 'uint8'], [sellerDomain_B, sellerId_B, sellerRel_B]).toString('hex')}`
-    const sellerHash_C = `0x${soliditySHA3(['string', 'string', 'uint8'], [sellerDomain_C, sellerId_C, sellerRel_C]).toString('hex')}`
     const domainHash = `0x${soliditySHA3(['bytes32'], [pubDomain]).toString('hex')}`
     const sellerHash_Result_A = await instance.sellers.call(domainHash, sellerHash_A)
     const sellerHash_Result_B = await instance.sellers.call(domainHash, sellerHash_B)
@@ -279,24 +279,6 @@ contract('DLS', function (accounts) {
     const publisher = accounts[1]
     const pubDomain = 'example.com'
 
-    const sellerDomain_A = 'a.com'
-    const sellerId_A = 'a-123'
-    const sellerRel_A = Relationship.Direct
-
-    const sellerDomain_B = 'b.com'
-    const sellerId_B = 'b-123'
-    const sellerRel_B = Relationship.Reseller
-
-    const sellerDomain_C = 'c.com'
-    const sellerId_C = 'c-123'
-    const sellerRel_C = Relationship.Direct
-
-    const hash_A = soliditySHA3(['string', 'string', 'uint8'], [sellerDomain_A, sellerId_A, sellerRel_A])
-
-    const hash_B = soliditySHA3(['string', 'string', 'uint8'], [sellerDomain_B, sellerId_B, sellerRel_B])
-
-    const hash_C = soliditySHA3(['string', 'string', 'uint8'], [sellerDomain_C, sellerId_C, sellerRel_C])
-
     const sellersList = [`0x${hash_A.toString('hex')}`, `0x${hash_B.toString('hex')}`, `0x${hash_C.toString('hex')}`]
 
     var result = await instance.removeSellers(sellersList, pubDomain, {
@@ -305,10 +287,6 @@ contract('DLS', function (accounts) {
 
     const eventObj = await getLastEvent(instance)
     assert.equal(eventObj.event, '_SellerRemoved')
-
-    const sellerHash_A = `0x${soliditySHA3(['string', 'string', 'uint8'], [sellerDomain_A, sellerId_A, sellerRel_A]).toString('hex')}`
-    const sellerHash_B = `0x${soliditySHA3(['string', 'string', 'uint8'], [sellerDomain_B, sellerId_B, sellerRel_B]).toString('hex')}`
-    const sellerHash_C = `0x${soliditySHA3(['string', 'string', 'uint8'], [sellerDomain_C, sellerId_C, sellerRel_C]).toString('hex')}`
 
     const domainHash = `0x${soliditySHA3(['bytes32'], [pubDomain]).toString('hex')}`
     const sellerHash_Result_A = await instance.sellers.call(domainHash, sellerHash_A)
