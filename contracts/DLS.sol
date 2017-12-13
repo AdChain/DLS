@@ -17,6 +17,7 @@ contract DLS {
    *
    * @example
    * "nytimes.com" -> "0x123...abc"
+   * publishers[domainHash] = pubKey
    */
   mapping (bytes32 => address) public publishers;
 
@@ -148,10 +149,11 @@ contract DLS {
   /**
    * @notice Deregister existing publisher.
    * Only contract owner is allowed to deregister.
-   * @param pubKey pubisher public key
+   * @param domain publisher domain to remove 
    */
-  function deregisterPublisher(address pubKey, bytes32 domain) onlyOwner external {
+  function deregisterPublisher(bytes32 domain) onlyOwner external {
     bytes32 domainHash = keccak256(domain);
+    address pubKey = publishers[domainHash];
     require(publishers[keccak256(domains[pubKey][domainHash])] != address(0));
     // order matters here, delete pub from map first.
     delete publishers[keccak256(domains[pubKey][domainHash])];

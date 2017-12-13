@@ -263,7 +263,7 @@ contract('DLS', function (accounts) {
     const publisher = accounts[1]
     const domain = 'example.com'
 
-    await instance.deregisterPublisher(publisher, domain, {from: owner})
+    await instance.deregisterPublisher(domain, {from: owner})
     const domainHash = `0x${soliditySHA3(['bytes32'], [domain]).toString('hex')}`
     const [publisher2] = await instance.publishers.call(domainHash)
 
