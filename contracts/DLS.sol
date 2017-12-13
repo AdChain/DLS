@@ -234,15 +234,16 @@ contract DLS {
    * @param pubKey publisher public key
    * @param domain publisher domain 
    * @param sellerDomain domain of seller
-   * @param sellerId ID of seller
+   * @param pubsAccountId ID associated with seller or reseller in advertising system 
    * @param sellerRel Relationship of seller. (Direct: 0, Reseller: 1)
+   * @param optional Optional Params (tagId, format, region)
    * @return boolean
    */
   function isSellerForPublisher(
     address pubKey,
     bytes32 domain,
     string sellerDomain,
-    string sellerId,
+    string pubsAccountId,
     Relationship sellerRel,
     string optional
   )
@@ -250,7 +251,7 @@ contract DLS {
   constant
   returns (bool) 
   {
-    bytes32 hash = keccak256(sellerDomain, sellerId, sellerRel, optional);
+    bytes32 hash = keccak256(sellerDomain, pubsAccountId, sellerRel, optional);
     return (sellers[keccak256(domains[pubKey][keccak256(domain)])][hash] != "");
   }
 }

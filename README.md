@@ -20,9 +20,12 @@ Smart contract documentation
 
 ## Terminology
  
- - *sellerDomain* is also known as *SSP/Exchange Domain* in ads.txt
- - *PubsAccountID* is also known as *Publisher’s Account ID* in ads.txt
- - *sellerPaymentType* is also known as *PaymentsType* in ads.txt
+ - *sellerDomain* is also known as *SSP/Exchange Domain* in ads.txt (required)
+ - *pubsAccountId* is also known as *Publisher’s Account ID* in ads.txt (required)
+ - *sellerRelationship* is ('DIRECT' or 'RESELLER') in ads.txt (required)
+ - *certId* is the certification authority ID e.g. Tag ID in ads.txt (optional)
+ - *format* is media format, e.g. Desktop Display Web, Mobile Video, ... (optional)
+ - *region* is the country (optional)
 
 # Test
 

@@ -11,23 +11,23 @@ const Relationship = {
 }
 
 const sellerDomain_A = 'a.com'
-const sellerId_A = 'a-123'
+const pubsAccountId_A = 'a-123'
 const sellerRel_A = Relationship.Direct
 const sellerOptional_A = 'a-optional' 
 
 const sellerDomain_B = 'b.com'
-const sellerId_B = 'b-123'
+const pubsAccountId_B = 'b-123'
 const sellerRel_B = Relationship.Reseller
 const sellerOptional_B = 'b-optional' 
 
 const sellerDomain_C = 'c.com'
-const sellerId_C = 'c-123'
+const pubsAccountId_C = 'c-123'
 const sellerRel_C = Relationship.Direct
 const sellerOptional_C = 'c-optional' 
 
-const hash_A = soliditySHA3(['string', 'string', 'uint8', 'string'], [sellerDomain_A, sellerId_A, sellerRel_A, sellerOptional_A]);
-const hash_B = soliditySHA3(['string', 'string', 'uint8', 'string'], [sellerDomain_B, sellerId_B, sellerRel_B, sellerOptional_B]);
-const hash_C = soliditySHA3(['string', 'string', 'uint8', 'string'], [sellerDomain_C, sellerId_C, sellerRel_C, sellerOptional_C]);
+const hash_A = soliditySHA3(['string', 'string', 'uint8', 'string'], [sellerDomain_A, pubsAccountId_A, sellerRel_A, sellerOptional_A]);
+const hash_B = soliditySHA3(['string', 'string', 'uint8', 'string'], [sellerDomain_B, pubsAccountId_B, sellerRel_B, sellerOptional_B]);
+const hash_C = soliditySHA3(['string', 'string', 'uint8', 'string'], [sellerDomain_C, pubsAccountId_C, sellerRel_C, sellerOptional_C]);
 
 const sellerHash_A = `0x${hash_A.toString('hex')}`
 const sellerHash_B = `0x${hash_B.toString('hex')}`
@@ -143,11 +143,11 @@ contract('DLS', function (accounts) {
     const publisher = accounts[6]
     const pubDomain = 'example.com'
     const sellerDomain = 'openx.com'
-    const sellerId = '1234'
+    const pubsAccountId = '1234'
     const rel = Relationship.Direct
     const optional = ''
 
-    const hash = `0x${soliditySHA3(['string', 'string', 'uint8', 'string'], [sellerDomain, sellerId, rel, optional]).toString('hex')}`
+    const hash = `0x${soliditySHA3(['string', 'string', 'uint8', 'string'], [sellerDomain, pubsAccountId, rel, optional]).toString('hex')}`
 
     let _err = null
 
@@ -166,18 +166,18 @@ contract('DLS', function (accounts) {
     const publisher = accounts[1]
     const pubDomain = 'example.com'
     const sellerDomain = 'openx.com'
-    const sellerId = '1234'
+    const pubsAccountId = '1234'
     const rel = Relationship.Direct
     const optional = ''
 
-    const hash = `0x${soliditySHA3(['string', 'string', 'uint8', 'string'], [sellerDomain, sellerId, rel, optional]).toString('hex')}`
+    const hash = `0x${soliditySHA3(['string', 'string', 'uint8', 'string'], [sellerDomain, pubsAccountId, rel, optional]).toString('hex')}`
 
     await instance.addSeller(hash, pubDomain, {from: publisher})
 
     const eventObj = await getLastEvent(instance)
     assert.equal(eventObj.event, '_SellerAdded')
 
-    const sellerHash = `0x${soliditySHA3(['string', 'string', 'uint8', 'string'], [sellerDomain, sellerId, rel, optional]).toString('hex')}`
+    const sellerHash = `0x${soliditySHA3(['string', 'string', 'uint8', 'string'], [sellerDomain, pubsAccountId, rel, optional]).toString('hex')}`
     const domainHash = `0x${soliditySHA3(['bytes32'], [pubDomain]).toString('hex')}`
     const sellerHash2 = await instance.sellers.call(domainHash, sellerHash)
 
@@ -244,11 +244,11 @@ contract('DLS', function (accounts) {
     assert.equal(isRegistered4, true)
 
     // Old publisher shoulnd't have sellers
-    const isSeller = await instance.isSellerForPublisher.call(publisher, domain, sellerDomain_A, sellerId_A, sellerRel_A, sellerOptional_A)
+    const isSeller = await instance.isSellerForPublisher.call(publisher, domain, sellerDomain_A, pubsAccountId_A, sellerRel_A, sellerOptional_A)
     assert.equal(isSeller, false)
 
     // New publisher should have sellers
-    const isSeller2 = await instance.isSellerForPublisher.call(updateToPublisher, domain, sellerDomain_A, sellerId_A, sellerRel_A, sellerOptional_A)
+    const isSeller2 = await instance.isSellerForPublisher.call(updateToPublisher, domain, sellerDomain_A, pubsAccountId_A, sellerRel_A, sellerOptional_A)
     assert.equal(isSeller2, true)
 
     //  update publisher back to original account
@@ -327,19 +327,19 @@ contract('DLS', function (accounts) {
 
     const publisher = accounts[1]
     const domain = 'example.com'
-    const sellerId = accounts[2]
+    const pubsAccountId = accounts[2]
     const sellerDomain = 'example.com'
     const rel = Relationship.Reseller
     const optional = ''
 
-    const sellerHash = `0x${soliditySHA3(['string', 'string', 'uint8', 'string'], [sellerDomain, sellerId, rel, optional]).toString('hex')}`
+    const sellerHash = `0x${soliditySHA3(['string', 'string', 'uint8', 'string'], [sellerDomain, pubsAccountId, rel, optional]).toString('hex')}`
 
     await instance.removeSeller(sellerHash, domain, {from: publisher})
 
-    const isSeller = await instance.isSellerForPublisher.call(publisher, domain, sellerDomain, sellerId, rel, optional)
+    const isSeller = await instance.isSellerForPublisher.call(publisher, domain, sellerDomain, pubsAccountId, rel, optional)
     assert.equal(isSeller, false)
 
-    const hash = await instance.sellers.call(publisher, sellerId)
+    const hash = await instance.sellers.call(publisher, pubsAccountId)
 
     assert.equal(parseInt(hash, 16), 0)
   })
