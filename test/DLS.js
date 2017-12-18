@@ -53,7 +53,7 @@ contract('DLS', function (accounts) {
     const publisher = accounts[1]
     const domain = 'example.com'
 
-    const isRegistered = await instance.isRegisteredPublisher(publisher, domain)
+    const isRegistered = await instance.isRegisteredPublisher(publisher)
     assert.equal(isRegistered, false)
 
     const isDomainRegistered = await instance.isRegisteredPublisherDomain(domain)
@@ -65,7 +65,7 @@ contract('DLS', function (accounts) {
 
     assert.equal(publisher2, publisher)
 
-    const isRegistered2 = await instance.isRegisteredPublisher(publisher, domain)
+    const isRegistered2 = await instance.isRegisteredPublisher(publisher)
     assert.equal(isRegistered2, true)
 
     const isDomainRegistered2 = await instance.isRegisteredPublisherDomain(domain)
@@ -86,10 +86,10 @@ contract('DLS', function (accounts) {
 
     assert.equal(publisher3, updateToPublisher)
 
-    const isRegistered3 = await instance.isRegisteredPublisher(publisher, domain)
+    const isRegistered3 = await instance.isRegisteredPublisher(publisher)
     assert.equal(isRegistered3, false)
 
-    const isRegistered4 = await instance.isRegisteredPublisher(updateToPublisher, domain)
+    const isRegistered4 = await instance.isRegisteredPublisher(updateToPublisher)
     assert.equal(isRegistered4, true)
 
     // Update publisher back
@@ -99,7 +99,7 @@ contract('DLS', function (accounts) {
     assert.equal(publisher4, publisher)
   })
 
-  it('should be able add publisher to registry with same public key', async () => {
+/*  it('should be able add publisher to registry with same public key', async () => {
     const instance = await DLS.deployed()
 
     // same pub key as prevous test
@@ -135,7 +135,7 @@ contract('DLS', function (accounts) {
 
     const isDomainRegistered3 = await instance.isRegisteredPublisherDomain(actualDomain)
     assert.equal(isDomainRegistered3, true)
-  })
+  })*/
 
   it('should not be able to add seller if not registered as publisher', async () => {
     const instance = await DLS.deployed()
@@ -152,7 +152,7 @@ contract('DLS', function (accounts) {
     let _err = null
 
     try {
-      await instance.addSeller(hash, pubDomain, {from: publisher})
+      await instance.addSeller(hash, {from: publisher})
     } catch (error) {
       _err = error
     }
@@ -172,7 +172,7 @@ contract('DLS', function (accounts) {
 
     const hash = `0x${soliditySHA3(['string', 'string', 'uint8', 'string'], [sellerDomain, pubsAccountId, rel, optional]).toString('hex')}`
 
-    await instance.addSeller(hash, pubDomain, {from: publisher})
+    await instance.addSeller(hash, {from: publisher})
 
     const eventObj = await getLastEvent(instance)
     assert.equal(eventObj.event, '_SellerAdded')
@@ -192,7 +192,7 @@ contract('DLS', function (accounts) {
 
     const sellersList = [`0x${hash_A.toString('hex')}`, `0x${hash_B.toString('hex')}`, `0x${hash_C.toString('hex')}`]
 
-    const result = await instance.addSellers(sellersList, pubDomain, {
+    const result = await instance.addSellers(sellersList, {
       from: publisher
     })
 
@@ -214,7 +214,7 @@ contract('DLS', function (accounts) {
       sellersList_B.push(`0x${soliditySHA3(['string'], [`${i}`]).toString('hex')}`)
     }
 
-    await instance.addSellers(sellersList_B, pubDomain, {
+    await instance.addSellers(sellersList_B, {
       from: publisher
     })
 
@@ -237,18 +237,18 @@ contract('DLS', function (accounts) {
     const publisher3 = await instance.publishers.call(domainHash)
     assert.equal(publisher3, updateToPublisher)
 
-    const isRegistered3 = await instance.isRegisteredPublisher(publisher, domain)
+    const isRegistered3 = await instance.isRegisteredPublisher(publisher)
     assert.equal(isRegistered3, false)
 
-    const isRegistered4 = await instance.isRegisteredPublisher(updateToPublisher, domain)
+    const isRegistered4 = await instance.isRegisteredPublisher(updateToPublisher)
     assert.equal(isRegistered4, true)
 
     // Old publisher shoulnd't have sellers
-    const isSeller = await instance.isSellerForPublisher.call(publisher, domain, sellerDomain_A, pubsAccountId_A, sellerRel_A, sellerOptional_A)
+    const isSeller = await instance.isSellerForPublisher.call(publisher, sellerDomain_A, pubsAccountId_A, sellerRel_A, sellerOptional_A)
     assert.equal(isSeller, false)
 
     // New publisher should have sellers
-    const isSeller2 = await instance.isSellerForPublisher.call(updateToPublisher, domain, sellerDomain_A, pubsAccountId_A, sellerRel_A, sellerOptional_A)
+    const isSeller2 = await instance.isSellerForPublisher.call(updateToPublisher, sellerDomain_A, pubsAccountId_A, sellerRel_A, sellerOptional_A)
     assert.equal(isSeller2, true)
 
     //  update publisher back to original account
@@ -269,10 +269,10 @@ contract('DLS', function (accounts) {
 
     assert.equal(publisher2, 0)
 
-    const domain2 = await instance.domains.call(publisher, domainHash)
+    const domain2 = await instance.domains.call(publisher)
     assert.equal(parseInt(domain2, 16), 0)
 
-    const isRegistered = await instance.isRegisteredPublisher(publisher, domain)
+    const isRegistered = await instance.isRegisteredPublisher(publisher)
     assert.equal(isRegistered, false)
 
     const isDomainRegistered = await instance.isRegisteredPublisherDomain(domain)
@@ -285,7 +285,7 @@ contract('DLS', function (accounts) {
     const publisher = accounts[1]
     const domain = 'example.com'
 
-    const isRegistered = await instance.isRegisteredPublisher(publisher, domain)
+    const isRegistered = await instance.isRegisteredPublisher(publisher)
     assert.equal(isRegistered, false)
 
     const isDomainRegistered = await instance.isRegisteredPublisherDomain(domain)
@@ -297,7 +297,7 @@ contract('DLS', function (accounts) {
 
     assert.equal(publisher2, publisher)
 
-    const isRegistered2 = await instance.isRegisteredPublisher(publisher, domain)
+    const isRegistered2 = await instance.isRegisteredPublisher(publisher)
     assert.equal(isRegistered2, true)
 
     const isDomainRegistered2 = await instance.isRegisteredPublisherDomain(domain)
@@ -334,9 +334,9 @@ contract('DLS', function (accounts) {
 
     const sellerHash = `0x${soliditySHA3(['string', 'string', 'uint8', 'string'], [sellerDomain, pubsAccountId, rel, optional]).toString('hex')}`
 
-    await instance.removeSeller(sellerHash, domain, {from: publisher})
+    await instance.removeSeller(sellerHash, {from: publisher})
 
-    const isSeller = await instance.isSellerForPublisher.call(publisher, domain, sellerDomain, pubsAccountId, rel, optional)
+    const isSeller = await instance.isSellerForPublisher.call(publisher,sellerDomain, pubsAccountId, rel, optional)
     assert.equal(isSeller, false)
 
     const hash = await instance.sellers.call(publisher, pubsAccountId)
@@ -352,7 +352,7 @@ contract('DLS', function (accounts) {
 
     const sellersList = [`0x${hash_A.toString('hex')}`, `0x${hash_B.toString('hex')}`, `0x${hash_C.toString('hex')}`]
 
-    var result = await instance.removeSellers(sellersList, pubDomain, {
+    var result = await instance.removeSellers(sellersList, {
       from: publisher
     })
 
