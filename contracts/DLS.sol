@@ -12,30 +12,6 @@ contract DLS {
     Reseller
   }
 
-  struct Publisher {
-    //uint publisherListIndex;
-    bytes32 domain; // Key
-
-    bytes32[] domainKey;
-    mapping(bytes32 => uint) domainKeyPointer;
-  }
-
-  /**
-   * @notice a mapping of domains to publisher public keys
-   *
-   * @example
-   * "nytimes.com" -> "0x123...abc"
-   * publishers[domainHash] = pubKey
-   */
-
-  //mapping (address => Publisher) public publishers; // allows random access
-  /**
-   *
-   * publisher["0x12345"][] = keccek256(domain)
-   */
-  mapping (address => bytes32[]) public publishers;
-  //bytes32[] public publisherList; // allows sequential access
-
   struct Domain {
     uint domainsListIndex; // index of domain in publisher["0x12345"][domainsListIndex]
     address publisherKey; // refer to owner of domain, publisherAddress
@@ -43,17 +19,26 @@ contract DLS {
   }
 
   /**
-   * @notice a mapping of publisher public keys and domainHash to domains
+   * @notice a mapping of publisher public keys to array of domains
+   *
+   * @example 
+   * publisher["0x12345"][0] = keccek256(domain)
+   */
+  mapping (address => bytes32[]) public publishers;
+  //bytes32[] public publisherList; // allows sequential access
+
+  /**
+   * @notice a mapping of domainHash to Domain Struct 
    *
    * @example
-   * "keccak256" -> Domain Object
+   * "keccak256" -> Domain struct 
    */
   mapping (bytes32 => Domain) public domains; // allows random access
   bytes32[] public domainsList; // sequential access
 
 
    /**
-    * @notice a mapping of publsher domains to
+    * @notice a mapping of publisher domainHashes to
     * their hashes of authorized sellers
     *
     * @example example
@@ -90,7 +75,7 @@ contract DLS {
 
   /**
    * @notice modifier which checks if sender is
-   * a registered publisher.
+   * a registered publisher of domain
    */
   modifier isRegistered(bytes32 domain) {
     require(domains[keccak256(domain)].publisherKey == msg.sender);
@@ -101,7 +86,7 @@ contract DLS {
 
   /**
    * @notice modifier which checks that
-   * publisher doesn't exist.
+   * publisher doesn't exist. No domains registered to publisher
    */
   modifier publisherDoesNotExist(address pubKey) {
     require(publishers[pubKey].length > 0);
@@ -130,7 +115,6 @@ contract DLS {
     constant 
     returns(bool isIndeed) 
   {
-    //if(publisherList.length==0) return false;
     // Check if publisher Address has any domains registered to it.
     return publishers[pubKey].length != 0;
   }
@@ -140,7 +124,7 @@ contract DLS {
     constant 
     returns(bool isIndeed) 
   {
-    if(domainsList.length==0) return false;
+    if (domainsList.length == 0) return false;
     return domains[keccak256(domain)].publisherKey != address(0);
   }
 
@@ -149,8 +133,8 @@ contract DLS {
    * Only the owner of the contract can register new publishers.
    * Publisher public key must not already exist in order to
    * be added or modified.
-   * @param domain pubisher domain
-   * @param pubKey pubisher public key
+   * @param domain publisher domain
+   * @param pubKey publisher public key
    */
   function registerPublisher(bytes32 domain, address pubKey) onlyOwner external {
     bytes32 domainHash = keccak256(domain);
@@ -170,8 +154,8 @@ contract DLS {
    * Only the owner of the contract can update publishers.
    * Publisher public key must already exist in order to
    * be modified.
-   * @param domain pubisher domain
-   * @param pubKey pubisher public key
+   * @param domain publisher domain
+   * @param pubKey publisher public key
    */
   function updatePublisher(bytes32 domain, address pubKey) onlyOwner external {
     bytes32 domainHash = keccak256(domain);
@@ -198,7 +182,7 @@ contract DLS {
   /**
    * @notice Deregister existing publisher.
    * Only contract owner is allowed to deregister.
-   * @param domain pubisher public key
+   * @param domain to deregister 
    */
   function deregisterPublisher(bytes32 domain) onlyOwner external {
     bytes32 domainHash = keccak256(domain);
@@ -217,11 +201,7 @@ contract DLS {
     domainsList.length--;
     delete domains[domainHash];
 
-    // order matters here, delete pub from map first.
-    /* delete publishers[domainHash];
-    delete domains[pubKey]; */
-
-    // TODO remove sellers
+    // remove sellers
     sellerList[domainHash].length = 0;
 
     _PublisherDeregistered(domain, pubKey);
@@ -234,7 +214,6 @@ contract DLS {
    */
   function addSeller(bytes32 domain, bytes32 hash) isRegistered(domain) public {
     bytes32 domainHash = keccak256(domain);
-    // Check if sender is in control of domain
 
     sellers[domainHash][hash] = sellerList[domainHash].push(hash) - 1;
     _SellerAdded(domain, hash);
