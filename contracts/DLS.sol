@@ -68,7 +68,7 @@ contract DLS {
    * a registered publisher.
    */
   modifier isRegistered() {
-    require(domains[msg.sender] != 0)
+    require(domains[msg.sender] != 0);
     // continue with code execution
     _;
   }
@@ -78,7 +78,7 @@ contract DLS {
    * publisher doesn't exist.
    */
   modifier publisherDoesNotExist(address pubKey) {
-    require(domains[pubKey] == 0)
+    require(domains[pubKey] == 0);
     _;
   }
 
