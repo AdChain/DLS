@@ -58,10 +58,7 @@ contract DLS {
    * of the function to the owner.
    */
   modifier onlyOwner() {
-    if (msg.sender != owner) {
-      revert();
-    }
-
+    require(msg.sender == owner);
     // continue with code execution
     _;
   }
@@ -71,10 +68,7 @@ contract DLS {
    * a registered publisher.
    */
   modifier isRegistered() {
-    if (domains[msg.sender] == 0) {
-      revert();
-    }
-
+    require(domains[msg.sender] != 0)
     // continue with code execution
     _;
   }
@@ -84,10 +78,7 @@ contract DLS {
    * publisher doesn't exist.
    */
   modifier publisherDoesNotExist(address pubKey) {
-    if (domains[pubKey] != 0) {
-      revert();
-    }
-
+    require(domains[pubKey] == 0)
     _;
   }
 
