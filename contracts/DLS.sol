@@ -22,7 +22,7 @@ contract DLS {
    * @notice a mapping of publisher public keys to array of domains
    *
    * @example 
-   * publisher["0x12345"][0] = keccek256(domain)
+   * publisher["0x12345"][0] = keccak256(domain)
    */
   mapping (address => bytes32[]) public publishers;
   //bytes32[] public publisherList; // allows sequential access
